@@ -26,10 +26,32 @@ int main(void)
     cout << "Vendor: " << "\t" << glGetString(GL_VENDOR) << "\n";
     cout << "Renderer: " << "\t" << glGetString(GL_RENDERER) << "\n";
     cout << "Version: " << "\t" << glGetString(GL_VERSION) << "\n";
+    cout << "\n";
+    cout << "Program Information:\n";
+
+    double previousTime = glfwGetTime();
+    int frameCount = 0;
+
+    cout << "FPS: \t" << "0";
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
+        // Measure speed
+        double currentTime = glfwGetTime();
+        frameCount++;
+
+
+        // If a second has passed.
+        if (currentTime - previousTime >= 1.0)
+        {
+            // Display the frame count here any way you want.
+            cout << "\r" << "FPS: \t" << frameCount;
+
+            frameCount = 0;
+            previousTime = currentTime;
+        }
+
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
