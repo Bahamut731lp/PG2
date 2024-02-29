@@ -6,6 +6,9 @@
 
 #include "App.h"
 #include "FrameCounter.h"
+#include "DebugOutputManager.h"
+#include "VSync.h";
+#include "InputManager.h";
 
 App::App()
 {
@@ -50,7 +53,12 @@ void App::report(void)
 int App::run()
 {
     FrameCounter fps;
-    std::cout << "FPS: \t" << "0";
+    DebugOutputManager debug;
+    InputManager inputs;
+
+    std::cout << "Debug Output: \t" << (debug.isAvailable ? "yes" : "no") << std::endl;
+
+    glfwSetKeyCallback(window, inputs.keyCallback);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -58,14 +66,9 @@ int App::run()
         if (fps.hasSecondPassed())
         {
             // Display the frame count here any way you want.
-            std::cout << "\r" << "FPS: \t" << fps.getNumberOfFrames() << "\t";
+            std::cout << "FPS: \t" << fps.getNumberOfFrames() << std::endl;
             fps.setNumberOfFrames(0);
         }
-
-        // 
-        // if (condition)
-        //   glfwSetWindowShouldClose(window, GLFW_TRUE);
-        // 
 
         // Clear OpenGL canvas, both color buffer and Z-buffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -76,6 +79,8 @@ int App::run()
         // Poll for and process events
         glfwPollEvents();
     }
+
+    std::cout << std::endl;
 
     return 0;
 }

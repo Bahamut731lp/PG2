@@ -142,11 +142,17 @@
   <ItemGroup>
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Cvičení.cpp" />
+    <ClCompile Include="DebugOutputManager.cpp" />
     <ClCompile Include="FrameCounter.cpp" />
+    <ClCompile Include="InputManager.cpp" />
+    <ClCompile Include="VSync.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
+    <ClInclude Include="DebugOutputManager.h" />
     <ClInclude Include="FrameCounter.h" />
+    <ClInclude Include="InputManager.h" />
+    <ClInclude Include="VSync.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
