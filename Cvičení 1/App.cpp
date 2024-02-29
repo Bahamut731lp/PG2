@@ -58,6 +58,7 @@ int App::run()
 
     std::cout << "Debug Output: \t" << (debug.isAvailable ? "yes" : "no") << std::endl;
 
+
     glfwSetKeyCallback(window, inputs.keyCallback);
 
     while (!glfwWindowShouldClose(window))
