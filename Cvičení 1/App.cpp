@@ -7,29 +7,18 @@
 #include "App.h"
 #include "FrameCounter.h"
 #include "DebugOutputManager.h"
-#include "VSync.h";
-#include "InputManager.h";
+#include "Window.h"
 
 App::App()
 {
     // default constructor
     // nothing to do here (so far...)
     std::cout << "New App constructed\n";
+    window = new Window(800, 600, "OpenGL Window");;
 }
 
 bool App::init()
 {
-    // init glfw
-    // https://www.glfw.org/documentation.html
-    if (!glfwInit()) {
-        return false;
-    }
-
-    // open window (GL canvas) with no special properties
-    // https://www.glfw.org/docs/latest/quick.html#quick_create_window
-    window = glfwCreateWindow(800, 600, "OpenGL context", NULL, NULL);
-    glfwMakeContextCurrent(window);
-
     // init glew
     // http://glew.sourceforge.net/basic.html
     glewInit();
@@ -54,14 +43,10 @@ int App::run()
 {
     FrameCounter fps;
     DebugOutputManager debug;
-    InputManager inputs;
 
     std::cout << "Debug Output: \t" << (debug.isAvailable ? "yes" : "no") << std::endl;
 
-
-    glfwSetKeyCallback(window, inputs.keyCallback);
-
-    while (!glfwWindowShouldClose(window))
+    while (!glfwWindowShouldClose(window->getWindow()))
     {
         // If a second has passed.
         if (fps.hasSecondPassed())
@@ -75,7 +60,7 @@ int App::run()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Swap front and back buffers
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(window->getWindow());
 
         // Poll for and process events
         glfwPollEvents();

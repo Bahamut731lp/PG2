@@ -1,4 +1,5 @@
 #pragma once
+#include "Window.h"
 
 class App {
 public:
@@ -10,5 +11,5 @@ public:
 
     ~App();
 private:
-    GLFWwindow* window;
+    Window* window;
 };
