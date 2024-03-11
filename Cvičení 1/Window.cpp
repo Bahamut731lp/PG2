@@ -27,7 +27,9 @@ Window::Window(int width, int height, const char* title, bool fullscreen, bool v
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetWindowUserPointer(window, this);
+
     glfwSetKeyCallback(window, key_callback);
+    glfwSetScrollCallback(window, scroll_callback);
 }
 
 Window::~Window() {
@@ -73,6 +75,7 @@ bool Window::isFullscreen() const {
     return fullscreen;
 }
 
+
 // Static key callback function
 void Window::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     // glfwGetWindowUserPointer() vytáhne z okna custom pointer, který je k nìmu pøiøazen
@@ -116,6 +119,23 @@ void Window::handle_key_press(int key, int action) {
             break;
         }
     }
+}
+
+void Window::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+    // Pro vysvìtlení viz Window::handle_key_event
+    Window* instance = static_cast<Window*>(glfwGetWindowUserPointer(window));
+    if (instance) {
+        instance->handle_scroll_event(xoffset, yoffset);
+    }
+}
+
+void Window::handle_scroll_event(double xoffset, double yoffset) {
+    GLclampf redf = static_cast<GLclampf>(yoffset / 10);
+    GLclampf greenf = static_cast<GLclampf>(yoffset / 10);
+    GLclampf bluef = static_cast<GLclampf>(yoffset / 10);
+
+    glClearColor(redf, greenf, bluef, 1);
+    glClear(GL_COLOR_BUFFER_BIT);
 }
 
 void Window::framebuffer_size_callback(GLFWwindow* window, int width, int height) {
