@@ -31,8 +31,8 @@ public:
 
 private:
 	GLuint ID{ 0 }; // default = 0, empty shader
-	std::string getShaderInfoLog(const GLuint obj);   // TODO: check for shader compilation error; if any, print compiler output  
-	std::string getProgramInfoLog(const GLuint obj);  // TODO: check for linker error; if any, print linker output
+	std::string getShaderInfoLog(const GLuint obj); 
+	std::string getProgramInfoLog(const GLuint obj);
 
 	GLuint compile_shader(const std::filesystem::path& source_file, const GLenum type); // TODO: try to load and compile shader
 	GLuint link_shader(const std::vector<GLuint> shader_ids);                            // TODO: try to link all shader IDs to final program
