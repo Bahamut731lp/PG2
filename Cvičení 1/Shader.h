@@ -4,6 +4,8 @@
 #include <filesystem>
 #include <iostream>
 
+#include <glm/glm.hpp> 
+#include <glm/ext.hpp>
 #include <GL/glew.h> 
 
 class Shader {

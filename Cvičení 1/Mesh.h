@@ -17,7 +17,7 @@ public:
     std::vector<Vertex> vertices;
     std::vector<GLuint> indices;
     GLuint texture_id{ 0 };
-    GLenum primitive_type = GL_POINT;
+    GLenum primitive_type = GL_TRIANGLES;
 
     // Mesh material
     glm::vec4 diffuse_color{ 1.0f };
@@ -31,5 +31,5 @@ public:
 private:
     // OpenGL buffer IDs
     // ID = 0 is reserved (i.e. uninitalized)
-    unsigned int VAO{ 0 }, VBO{ 0 }, EBO{ 0 };
+    unsigned int VAO, VBO, EBO;
 };

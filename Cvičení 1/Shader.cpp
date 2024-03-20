@@ -113,15 +113,21 @@ std::string Shader::getProgramInfoLog(const GLuint obj)
 GLuint Shader::compile_shader(const std::filesystem::path& source_file, const GLenum type)
 {
 	GLuint shader_h = glCreateShader(type);
-	const char* shader_string = textFileRead(source_file).c_str();
-	glShaderSource(shader_h, 1, &shader_string, NULL);
+	std::string shader_string = textFileRead(source_file);
+	const char* shader_c_str = shader_string.c_str();
+	glShaderSource(shader_h, 1, &shader_c_str, NULL);
 	glCompileShader(shader_h);
+
 	{
-		GLint cmlp_status;
-		glGetShaderiv(shader_h, GL_COMPILE_STATUS, &cmlp_status);
-		if (cmlp_status == GL_FALSE) {
-			std::cerr << getShaderInfoLog(shader_h);
-			throw std::exception("Shader compilation err.\n");
+		GLint compile_status;
+		glGetShaderiv(shader_h, GL_COMPILE_STATUS, &compile_status);
+		if (compile_status == GL_FALSE) {
+			GLint log_length;
+			glGetShaderiv(shader_h, GL_INFO_LOG_LENGTH, &log_length);
+			std::vector<char> log(log_length + 1);
+			glGetShaderInfoLog(shader_h, log_length, NULL, log.data());
+			std::cerr << "Shader compilation error:\n" << log.data() << std::endl;
+			throw std::runtime_error("Shader compilation error.");
 		}
 	}
 	return shader_h;
