@@ -59,7 +59,7 @@ OBJLoader::OBJLoader(const std::filesystem::path& filename)
 			rtrim(line);
 			
 			face_index += 1;
-			std::cout << "Face index: " << face_index << std::endl;
+			//std::cout << "Face index: " << face_index << std::endl;
 
 			int vertexIndex[4], uvIndex[4], normalIndex[4];
 			std::vector<std::string> _tokens = split(line, ' ');

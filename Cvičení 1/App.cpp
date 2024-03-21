@@ -50,7 +50,7 @@ int App::run()
 
     std::cout << "Debug Output: \t" << (debug.isAvailable ? "yes" : "no") << std::endl;
 
-    OBJLoader test{ "./assets/obj/sphere_tri_vnt.obj" };
+    OBJLoader test{ "./assets/obj/bunny_tri_vnt.obj" };
 
     auto vertexShaderPath = std::filesystem::path("./assets/shaders/basic.vert");
     auto fragmentShaderPath = std::filesystem::path("./assets/shaders/basic.frag");
@@ -74,8 +74,17 @@ int App::run()
 
 
         glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
         shader.setUniform("transform", trans);
+
+        glm::mat4 view = glm::mat4(1.0f);
+        // note that we're translating the scene in the reverse direction of where we want to move
+        view = glm::translate(view, glm::vec3(0.0f, -2.5f, -15.0f));
+        shader.setUniform("view", view);
+
+        glm::mat4 projection = glm::mat4(1.0f);
+        projection = glm::perspective(glm::radians(60.0f), 1920.0f / 1080.0f, 0.1f, 100.0f);
+        shader.setUniform("projection", projection);
 
         mesh.draw(shader);
 
