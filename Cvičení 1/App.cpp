@@ -41,6 +41,13 @@ void App::report(void)
     std::cout << "Renderer: " << "\t" << glGetString(GL_RENDERER) << std::endl;
     std::cout << "Version: " << "\t" << glGetString(GL_VERSION) << std::endl;
     std::cout << "Extensions: " << "\t" << extensionCount << std::endl;
+
+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CCW);
+
+    glEnable(GL_DEPTH_TEST);
 }
 
 int App::run()
@@ -79,7 +86,7 @@ int App::run()
 
         glm::mat4 view = glm::mat4(1.0f);
         // note that we're translating the scene in the reverse direction of where we want to move
-        view = glm::translate(view, glm::vec3(0.0f, -2.5f, -15.0f));
+        view = glm::translate(view, glm::vec3(0.0f, -1.5f, -12.5f));
         shader.setUniform("view", view);
 
         glm::mat4 projection = glm::mat4(1.0f);
