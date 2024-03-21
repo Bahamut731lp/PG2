@@ -33,8 +33,8 @@ public:
 
 	//...
 
-private:
 	GLuint ID{ 0 }; // default = 0, empty shader
+private:
 	std::string getShaderInfoLog(const GLuint obj); 
 	std::string getProgramInfoLog(const GLuint obj);
 

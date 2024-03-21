@@ -2,6 +2,7 @@
 #include "Vertex.h"
 #include "Mesh.h"
 #include "OBJLoader.h"
+#include "StringUtils.h"
 
 OBJLoader::OBJLoader(const std::filesystem::path& filename)
 {
@@ -22,6 +23,7 @@ OBJLoader::OBJLoader(const std::filesystem::path& filename)
 	}
 
 	const int MAX_LINE_SIZE = 255;
+	int face_index = 0;
 
 	while (1) {
 		char lineHeader[MAX_LINE_SIZE];
@@ -47,24 +49,87 @@ OBJLoader::OBJLoader(const std::filesystem::path& filename)
 			temp_normals.push_back(normal);
 		}
 		else if (strcmp(lineHeader, "f") == 0) {
-			std::string vertex1, vertex2, vertex3;
-			unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
-			int matches = fscanf_s(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2]);
-			if (matches != 9) {
-				printf("File can't be read by simple parser :( Try exporting with other options\n");
+			char buffer[MAX_LINE_SIZE];
+			fgets(buffer, MAX_LINE_SIZE, file);
+
+			// Parse the buffer as a string
+			std::string line(buffer);
+
+			ltrim(line);
+			rtrim(line);
+			
+			face_index += 1;
+			std::cout << "Face index: " << face_index << std::endl;
+
+			int vertexIndex[4], uvIndex[4], normalIndex[4];
+			std::vector<std::string> _tokens = split(line, ' ');
+			std::vector<std::string> tokens;
+			for (int i = 0; i < _tokens.size(); ++i) {
+				if (std::all_of(_tokens[i].begin(), _tokens[i].end(), [](unsigned char c) { return std::isspace(c); })) continue;
+
+				tokens.push_back(_tokens[i]);
+			}
+			
+			// How many vertexes does the face have?
+			int vertex_number = tokens.size();
+
+			// For each vertex/uv/normal in face, parse it
+			for (int i = 0; i < tokens.size(); ++i) {
+				auto token = tokens[i];
+				auto values = split(token, '/');
+
+				for (int j = 0; j < values.size(); ++j) {
+					int number;
+					std::istringstream iss(values[j]);
+
+					// String to integer conversion was successfull
+					if (iss >> number) {
+						//Hele tohle pùjde urèitì udìlat líp
+						if (j == 0) vertexIndex[i] = number;
+						if (j == 1) uvIndex[i] = number;
+						if (j == 2) normalIndex[i] = number;
+					}
+				}
+			}
+
+			if (vertex_number == 3) {
+				// Handle triangular face
+				for (int i = 0; i < 3; ++i) {
+					vertexIndices.push_back(vertexIndex[i]);
+					uvIndices.push_back(uvIndex[i]);
+					normalIndices.push_back(normalIndex[i]);
+				}
+			}
+			else if (vertex_number == 4) {
+				// Handle quad face
+				// Convert quad into two triangles
+				for (int i = 0; i < 3; ++i) {
+					vertexIndices.push_back(vertexIndex[i]);
+					uvIndices.push_back(uvIndex[i]);
+					normalIndices.push_back(normalIndex[i]);
+				}
+				for (int i = 2; i < 5; ++i) {
+					vertexIndices.push_back(vertexIndex[i % 4]);
+					uvIndices.push_back(uvIndex[i % 4]);
+					normalIndices.push_back(normalIndex[i % 4]);
+				}
+			}
+			else {
+				printf("Error: Face format not supported.\n");
 				return;
 			}
-			vertexIndices.push_back(vertexIndex[0]);
-			vertexIndices.push_back(vertexIndex[1]);
-			vertexIndices.push_back(vertexIndex[2]);
-			uvIndices.push_back(uvIndex[0]);
-			uvIndices.push_back(uvIndex[1]);
-			uvIndices.push_back(uvIndex[2]);
-			normalIndices.push_back(normalIndex[0]);
-			normalIndices.push_back(normalIndex[1]);
-			normalIndices.push_back(normalIndex[2]);
 		}
 	}
+
+	std::cout << "V: " << temp_vertices.size() << std::endl;
+	std::cout << "U: " << temp_uvs.size() << std::endl;
+	std::cout << "N: " << temp_normals.size() << std::endl;
+	std::cout << std::endl << std::endl;
+
+	std::cout << "V_I: " << vertexIndices.size() << std::endl;
+	std::cout << "U_I: " << uvIndices.size() << std::endl;
+	std::cout << "N_I: " << normalIndices.size() << std::endl;
+	std::cout << std::endl;
 
 	// unroll from indirect to direct vertex specification
 	// sometimes not necessary, definitely not optimal
@@ -73,15 +138,21 @@ OBJLoader::OBJLoader(const std::filesystem::path& filename)
 		glm::vec3 vertex = temp_vertices[vertexIndex - 1];
 		vertices.push_back(vertex);
 	}
-	for (unsigned int u = 0; u < uvIndices.size(); u++) {
-		unsigned int uvIndex = uvIndices[u];
-		glm::vec2 uv = temp_uvs[uvIndex - 1];
-		uvs.push_back(uv);
+
+	if (!temp_uvs.empty()) {
+		for (unsigned int u = 0; u < uvIndices.size(); u++) {
+			unsigned int uvIndex = uvIndices[u];
+			glm::vec2 uv = temp_uvs[uvIndex - 1];
+			uvs.push_back(uv);
+		}
 	}
-	for (unsigned int u = 0; u < normalIndices.size(); u++) {
-		unsigned int normalIndex = normalIndices[u];
-		glm::vec3 normal = temp_normals[normalIndex - 1];
-		normals.push_back(normal);
+
+	if (!temp_normals.empty()) {
+		for (unsigned int u = 0; u < normalIndices.size(); u++) {
+			unsigned int normalIndex = normalIndices[u];
+			glm::vec3 normal = temp_normals[normalIndex - 1];
+			normals.push_back(normal);
+		}
 	}
 
 	// Iterate through the vertices and assign indices sequentially
@@ -90,11 +161,6 @@ OBJLoader::OBJLoader(const std::filesystem::path& filename)
 	}
 
 	fclose(file);
-
-	//TODO: Cover the situation that these sizes are not the same
-	std::cout << "V: " << vertices.size() << std::endl;
-	std::cout << "U: " << uvs.size() << std::endl;
-	std::cout << "N: " << normals.size() << std::endl;
 }
 
 Mesh OBJLoader::getMesh()
@@ -106,8 +172,8 @@ Mesh OBJLoader::getMesh()
 	for (unsigned int i = 0; i < vertices.size(); i++) {
 		Vertex vertex;
 		vertex.Position = vertices[i];
-		vertex.UVs = uvs[i];
-		vertex.Normal = normals[i];
+		vertex.UVs = i < uvs.size() ? uvs[i] : glm::vec2{ 0.5, 0.5 };
+		vertex.Normal = i < normals.size() ? normals[i] : glm::vec3{ 0, 0, 0 };
 
 		vertexes.push_back(vertex);
 	}

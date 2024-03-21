@@ -150,6 +150,7 @@
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="OBJLoader.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="StringUtils.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -161,6 +162,7 @@
     <ClInclude Include="Model.h" />
     <ClInclude Include="OBJLoader.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="StringUtils.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>

@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 #include <GL/wglew.h>
 #include <GLFW/glfw3.h>
+#include "glm/glm.hpp"
 
 #include "App.h"
 #include "FrameCounter.h"
@@ -10,6 +11,7 @@
 #include "Window.h"
 #include "OBJLoader.h"
 #include "Mesh.h"
+#include "Shader.h"
 
 App::App()
 {
@@ -28,20 +30,6 @@ bool App::init()
 
     return true;
 }
-
-const char* vertexShaderSource = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
-const char* fragmentShaderSource = "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "void main()\n"
-    "{\n"
-    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-    "}\n\0";
-
 
 void App::report(void)
 {
@@ -62,9 +50,14 @@ int App::run()
 
     std::cout << "Debug Output: \t" << (debug.isAvailable ? "yes" : "no") << std::endl;
 
-    OBJLoader test{ "C:/data/assets/obj/sphere_tri_vnt.obj" };
-    Shader q{ "C:/data/resources/basic.vert", "C:/data/resources/basic.frag" };
+    OBJLoader test{ "./assets/obj/sphere_tri_vnt.obj" };
+
+    auto vertexShaderPath = std::filesystem::path("./assets/shaders/basic.vert");
+    auto fragmentShaderPath = std::filesystem::path("./assets/shaders/basic.frag");
+    auto shader = Shader(vertexShaderPath, fragmentShaderPath);
     auto mesh = test.getMesh();
+
+    std::cout << shader.ID << std::endl;
 
     while (!glfwWindowShouldClose(window->getWindow()))
     {
@@ -79,7 +72,12 @@ int App::run()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        mesh.draw(q);
+
+        glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        shader.setUniform("transform", trans);
+
+        mesh.draw(shader);
 
         // Swap front and back buffers
         glfwSwapBuffers(window->getWindow());
