@@ -11,21 +11,28 @@ Camera::Camera(glm::vec3 position)
 	this->Position = glm::vec3(0.0f, 0.0f, 3.0f);
 	this->Front = glm::vec3(0.0f, 0.0f, -1.0f);
 	this->Up = glm::vec3(0.0f, 1.0f, 0.0f);
-	
-	MovementSpeed = 4.0f;
-	SprintFactor = 3.0f;
-	MouseSensitivity = 0.25f;
+	this->Right = glm::vec3(0.0f, 0.0f, 0.0f);
+	this->WorldUp = glm::vec3(0.0f, 0.0f, 0.0f);
+
+	this->Yaw = -90.0f;
+	this->Pitch = 30.0f;
+	this->Roll = 30.0f;
+	this->Zoom = 0.0f;
+
+	this->MovementSpeed = 4.0f;
+	this->SprintFactor = 3.0f;
+	this->MouseSensitivity = 0.25f;
 
 	// initialization of the camera reference system
 	//this->updateCameraVectors();
 }
 
 glm::mat4 Camera::getViewMatrix() {
-	return glm::lookAt(this->Position, this->Position + this->Front, this->Up);
+	return glm::lookAt(Position, Position + Front, Up);
 }
 
 glm::mat4 Camera::getProjectionMatrix() {
-	return glm::perspective(glm::radians(this->FOV), 1920.0f / 1080.0f, 0.1f, 100.0f);
+	return glm::perspective(glm::radians(FOV), 1920.0f / 1080.0f, 0.1f, 100.0f);
 }
 
 void Camera::onKeyboardEvent(GLFWwindow* window, GLfloat deltaTime)
