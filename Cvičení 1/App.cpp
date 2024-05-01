@@ -1,8 +1,14 @@
 #include <iostream>
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
 #include <GL/glew.h>
 #include <GL/wglew.h>
 #include <GLFW/glfw3.h>
+#include <ft2build.h>
+#include <freetype/freetype.h>
 #include "glm/glm.hpp"
 
 #include "App.h"
@@ -14,6 +20,7 @@
 
 #include "FrameCounter.h"
 #include "DebugOutputManager.h"
+#include "Scene.h"
 
 App::App()
 {
@@ -29,6 +36,16 @@ bool App::init()
     // http://glew.sourceforge.net/basic.html
     glewInit();
     wglewInit();
+
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    auto io = ImGui::GetIO();
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(window->getWindow(), true);
+    ImGui_ImplOpenGL3_Init("#version 460");
 
     return true;
 }
@@ -54,30 +71,35 @@ void App::report(void)
 
 int App::run()
 {
+    //auto menu = Scene{};
+
     FrameCounter fps;
     DebugOutputManager debug;
 
     std::cout << "Debug Output: \t" << (debug.isAvailable ? "yes" : "no") << std::endl;
 
-    OBJLoader test{ "./assets/obj/bunny_tri_vnt.obj" };
+    //OBJLoader test{ "./assets/obj/bunny_tri_vnt.obj" };
 
-    auto camera = Camera{ glm::vec3(0.0f, 0.0f, 0.0f) };
-    auto mesh = test.getMesh();
+    //auto camera = Camera{ glm::vec3(0.0f, 0.0f, 0.0f) };
+    //auto mesh = test.getMesh();
 
-    auto vertexShaderPath = std::filesystem::path("./assets/shaders/basic.vert");
-    auto fragmentShaderPath = std::filesystem::path("./assets/shaders/basic.frag");
-    auto shader = Shader(vertexShaderPath, fragmentShaderPath);
+    //auto vertexShaderPath = std::filesystem::path("./assets/shaders/basic.vert");
+    //auto fragmentShaderPath = std::filesystem::path("./assets/shaders/basic.frag");
+    //auto shader = Shader(vertexShaderPath, fragmentShaderPath);
 
-    shader.setUniform("projection", camera.getProjectionMatrix());
-    //glfwSetCursorPosCallback(window->getWindow(), camera.onMouseEvent);
+    //shader.setUniform("projection", camera.getProjectionMatrix());
+
     
     float deltaTime = 0.0f;	// Time between current frame and last frame
     float lastFrame = 0.0f; // Time of last frame
 
-    std::cout << shader.ID << std::endl;
-
+    //std::cout << shader.ID << std::endl;
+    //glfwSetCursorPosCallback(window, mouse_callback);
+       
     while (!glfwWindowShouldClose(window->getWindow()))
     {
+
+        //menu.render();
         // If a second has passed.
         if (fps.hasSecondPassed())
         {
@@ -89,34 +111,51 @@ int App::run()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        float currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+           
+        ImGui::SetNextWindowSize(ImVec2(200, ImGui::GetFrameHeightWithSpacing()));
+        ImGui::SetNextWindowPos(ImVec2(10, 10)); // Position the FPS counter at (10, 10) from the top-left corner
+        ImGui::Begin("FPS Counter", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings);
+        ImGui::Text(fps.render().c_str());
+        ImGui::End();
 
-        camera.onKeyboardEvent(window->getWindow(), deltaTime); // process keys etc
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-        glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
-        shader.setUniform("transform", trans);
+        //float currentFrame = glfwGetTime();
+        //deltaTime = currentFrame - lastFrame;
+        //lastFrame = currentFrame;
 
-        // Tady si musim nastudovat, co to vlastnì kurva dìlá.
-        // Jako position chápu, front už taky, ale ten up vector je nìjakej zakletej
-        //camera.Pitch = 30.0f;
+        //camera.onKeyboardEvent(window->getWindow(), deltaTime); // process keys etc
 
-        shader.setUniform("view", camera.getViewMatrix());
+        //glm::mat4 trans = glm::mat4(1.0f);
+        //trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
+        //shader.setUniform("transform", trans);
 
-        //glm::mat4 projection = glm::mat4(1.0f);
-        //projection = glm::perspective(glm::radians(60.0f), 1920.0f / 1080.0f, 0.1f, 100.0f);
-        shader.setUniform("projection", camera.getProjectionMatrix());
+        //// Tady si musim nastudovat, co to vlastnì kurva dìlá.
+        //// Jako position chápu, front už taky, ale ten up vector je nìjakej zakletej
+        ////camera.Pitch = 30.0f;
 
-        mesh.draw(shader);
+        //shader.setUniform("view", camera.getViewMatrix());
 
-        // Swap front and back buffers
+        ////glm::mat4 projection = glm::mat4(1.0f);
+        ////projection = glm::perspective(glm::radians(60.0f), 1920.0f / 1080.0f, 0.1f, 100.0f);
+        //shader.setUniform("projection", camera.getProjectionMatrix());
+
+        //mesh.draw(shader);
+
+        //// Swap front and back buffers
         glfwSwapBuffers(window->getWindow());
 
-        // Poll for and process events
+        //// Poll for and process events
         glfwPollEvents();
     }
+    
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
     std::cout << std::endl;
 
