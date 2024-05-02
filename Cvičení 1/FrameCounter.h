@@ -8,8 +8,8 @@ public:
 
 	bool hasSecondPassed();
 	int getNumberOfFrames();
+	int getLastNumberOfFrames();
 	void setNumberOfFrames(int);
-	std::string render();
 private:
 	double previousTime;
 	double currentTime;

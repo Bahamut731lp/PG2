@@ -19,12 +19,12 @@ Camera::Camera(glm::vec3 position)
 	this->Roll = 30.0f;
 	this->Zoom = 0.0f;
 
-	this->MovementSpeed = 4.0f;
+	this->MovementSpeed = 10.0f;
 	this->SprintFactor = 3.0f;
-	this->MouseSensitivity = 0.25f;
+	this->MouseSensitivity = 0.1f;
 
 	// initialization of the camera reference system
-	//this->updateCameraVectors();
+	this->updateCameraVectors();
 }
 
 glm::mat4 Camera::getViewMatrix() {

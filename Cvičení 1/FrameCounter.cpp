@@ -32,7 +32,7 @@ void FrameCounter::setNumberOfFrames(int frames)
     previousTime = glfwGetTime();
 }
 
-std::string FrameCounter::render()
+int FrameCounter::getLastNumberOfFrames()
 {
-    return "FPS :" + std::to_string(this->lastFrameCount);
+    return this->lastFrameCount;
 }

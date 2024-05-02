@@ -1,5 +1,12 @@
 #pragma once
 #include "Window.h"
+#include "Camera.h"
+
+// Initializing static variables
+float Window::lastX = 0.0f;
+float Window::lastY = 0.0f;
+bool Window::isMouseMoved = false;
+Camera* Window::cam = nullptr;
 
 Window::Window(int width, int height, const char* title, bool fullscreen, bool vsync)
     : fullscreen(fullscreen), vsync(vsync) {
@@ -30,6 +37,7 @@ Window::Window(int width, int height, const char* title, bool fullscreen, bool v
 
     glfwSetKeyCallback(window, key_callback);
     glfwSetScrollCallback(window, scroll_callback);
+    this->set_vsync(vsync);
 }
 
 Window::~Window() {
@@ -119,6 +127,27 @@ void Window::handle_key_press(int key, int action) {
             break;
         }
     }
+}
+
+void Window::mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
+{
+    float xpos = static_cast<float>(xposIn);
+    float ypos = static_cast<float>(yposIn);
+
+    if (Window::isMouseMoved)
+    {
+        Window::lastX = xpos;
+        Window::lastY = ypos;
+        Window::isMouseMoved = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+    lastX = xpos;
+    lastY = ypos;
+
+    Window::cam->onMouseEvent(xoffset, yoffset, GL_TRUE);
 }
 
 void Window::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {

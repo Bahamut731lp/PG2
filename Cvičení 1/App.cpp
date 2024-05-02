@@ -7,27 +7,25 @@
 #include <GL/glew.h>
 #include <GL/wglew.h>
 #include <GLFW/glfw3.h>
-#include <ft2build.h>
-#include <freetype/freetype.h>
+#include <string>
 #include "glm/glm.hpp"
 
 #include "App.h"
-#include "Window.h"
 #include "Camera.h"
+#include "Window.h"
 #include "OBJLoader.h"
 #include "Mesh.h"
 #include "Shader.h"
 
 #include "FrameCounter.h"
 #include "DebugOutputManager.h"
-#include "Scene.h"
 
 App::App()
 {
     // default constructor
     // nothing to do here (so far...)
     std::cout << "New App constructed\n";
-    window = new Window(800, 600, "OpenGL Window");;
+    window = new Window(800, 600, "OpenGL Window", false, false);
 }
 
 bool App::init()
@@ -71,80 +69,80 @@ void App::report(void)
 
 int App::run()
 {
-    //auto menu = Scene{};
-
     FrameCounter fps;
     DebugOutputManager debug;
 
     std::cout << "Debug Output: \t" << (debug.isAvailable ? "yes" : "no") << std::endl;
 
-    //OBJLoader test{ "./assets/obj/bunny_tri_vnt.obj" };
+    OBJLoader test{ "./assets/obj/bunny_tri_vnt.obj" };
 
-    //auto camera = Camera{ glm::vec3(0.0f, 0.0f, 0.0f) };
-    //auto mesh = test.getMesh();
+    auto camera = Camera{ glm::vec3(0.0f, 0.0f, 0.0f) };
+    auto mesh = test.getMesh();
+    auto vertexShaderPath = std::filesystem::path("./assets/shaders/basic.vert");
+    auto fragmentShaderPath = std::filesystem::path("./assets/shaders/basic.frag");
+    auto shader = Shader(vertexShaderPath, fragmentShaderPath);
 
-    //auto vertexShaderPath = std::filesystem::path("./assets/shaders/basic.vert");
-    //auto fragmentShaderPath = std::filesystem::path("./assets/shaders/basic.frag");
-    //auto shader = Shader(vertexShaderPath, fragmentShaderPath);
+    Window::cam = &camera;
 
-    //shader.setUniform("projection", camera.getProjectionMatrix());
+    shader.setUniform("projection", camera.getProjectionMatrix());
 
-    
     float deltaTime = 0.0f;	// Time between current frame and last frame
     float lastFrame = 0.0f; // Time of last frame
 
-    //std::cout << shader.ID << std::endl;
-    //glfwSetCursorPosCallback(window, mouse_callback);
-       
+    std::cout << shader.ID << std::endl;
+    glfwSetCursorPosCallback(window->getWindow(), Window::mouse_callback);
+    glfwSetInputMode(window->getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
     while (!glfwWindowShouldClose(window->getWindow()))
     {
-
         //menu.render();
         // If a second has passed.
-        if (fps.hasSecondPassed())
-        {
-            // Display the frame count here any way you want.
-            std::cout << "FPS: \t" << fps.getNumberOfFrames() << std::endl;
+        if (fps.hasSecondPassed()) {
             fps.setNumberOfFrames(0);
         }
 
+        // Clearing the window
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+            
+        // New GUI frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-           
-        ImGui::SetNextWindowSize(ImVec2(200, ImGui::GetFrameHeightWithSpacing()));
-        ImGui::SetNextWindowPos(ImVec2(10, 10)); // Position the FPS counter at (10, 10) from the top-left corner
+
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
+        camera.onKeyboardEvent(window->getWindow(), deltaTime); // process keys etc
+
+        glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
+        shader.setUniform("transform", trans);
+
+        // Tady si musim nastudovat, co to vlastnì kurva dìlá.
+        // Jako position chápu, front už taky, ale ten up vector je nìjakej zakletej
+        //camera.Pitch = 30.0f;
+
+        shader.setUniform("view", camera.getViewMatrix());
+
+        //glm::mat4 projection = glm::mat4(1.0f);
+        //projection = glm::perspective(glm::radians(60.0f), 1920.0f / 1080.0f, 0.1f, 100.0f);
+        shader.setUniform("projection", camera.getProjectionMatrix());
+
+        mesh.draw(shader);
+
+        // Draw HUD
+        ImGui::SetNextWindowSize(ImVec2(200, ImGui::GetTextLineHeightWithSpacing() * 3));
+        ImGui::SetNextWindowPos(ImVec2(10, 10));
         ImGui::Begin("FPS Counter", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings);
-        ImGui::Text(fps.render().c_str());
+        // Could be realtime if std::round(1 / deltatime);
+        ImGui::Text("FPS: %d", fps.getLastNumberOfFrames());
+        ImGui::Text("Vsync: %s", window->isVSynced() ? "True" : "False");
         ImGui::End();
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        //float currentFrame = glfwGetTime();
-        //deltaTime = currentFrame - lastFrame;
-        //lastFrame = currentFrame;
-
-        //camera.onKeyboardEvent(window->getWindow(), deltaTime); // process keys etc
-
-        //glm::mat4 trans = glm::mat4(1.0f);
-        //trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
-        //shader.setUniform("transform", trans);
-
-        //// Tady si musim nastudovat, co to vlastnì kurva dìlá.
-        //// Jako position chápu, front už taky, ale ten up vector je nìjakej zakletej
-        ////camera.Pitch = 30.0f;
-
-        //shader.setUniform("view", camera.getViewMatrix());
-
-        ////glm::mat4 projection = glm::mat4(1.0f);
-        ////projection = glm::perspective(glm::radians(60.0f), 1920.0f / 1080.0f, 0.1f, 100.0f);
-        //shader.setUniform("projection", camera.getProjectionMatrix());
-
-        //mesh.draw(shader);
 
         //// Swap front and back buffers
         glfwSwapBuffers(window->getWindow());
