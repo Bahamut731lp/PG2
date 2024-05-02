@@ -1,4 +1,5 @@
 #pragma once
+#include "Logger.h"
 #include "Window.h"
 #include "Camera.h"
 
@@ -117,13 +118,13 @@ void Window::handle_key_press(int key, int action) {
         case GLFW_KEY_F: {
             fullscreen = !fullscreen;
             set_fullscreen(fullscreen);
-            std::cout << "Fullscreen " << (fullscreen ? "enabled" : "disabled") << std::endl;
+            Logger::info("Fullscreen " + std::string(fullscreen ? "enabled" : "disabled"));
             break;
         }
         case GLFW_KEY_V: {
             vsync = !vsync;
             set_vsync(vsync);
-            std::cout << "VSync " << (vsync ? "enabled" : "disabled") << std::endl;
+            Logger::info("VSync " + std::string(vsync ? "enabled" : "disabled"));
             break;
         }
     }
@@ -131,6 +132,14 @@ void Window::handle_key_press(int key, int action) {
 
 void Window::mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 {
+    // Check if any camera was assigned to the window,
+    // since default value is null pointer, which could lead
+    // to crashes. We do not want that.
+    if (Window::cam == nullptr) {
+        Logger::warning("No camera was assigned to the window");
+        return;
+    }
+
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
 

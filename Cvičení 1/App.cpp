@@ -1,4 +1,6 @@
 #include <iostream>
+#include <string>
+#include <sstream>
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -7,9 +9,9 @@
 #include <GL/glew.h>
 #include <GL/wglew.h>
 #include <GLFW/glfw3.h>
-#include <string>
 #include "glm/glm.hpp"
 
+#include "Logger.h"
 #include "App.h"
 #include "Camera.h"
 #include "Window.h"
@@ -24,7 +26,7 @@ App::App()
 {
     // default constructor
     // nothing to do here (so far...)
-    std::cout << "New App constructed\n";
+    Logger::info("New Application has been constructed.");
     window = new Window(800, 600, "OpenGL Window", false, false);
 }
 
@@ -37,6 +39,7 @@ bool App::init()
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -53,18 +56,24 @@ void App::report(void)
     GLint extensionCount;
     glGetIntegerv(GL_NUM_EXTENSIONS, &extensionCount);
 
-    std::cout << "OpenGL Information:" << std::endl;
-    std::cout << "Vendor: " << "\t" << glGetString(GL_VENDOR) << std::endl;
-    std::cout << "Renderer: " << "\t" << glGetString(GL_RENDERER) << std::endl;
-    std::cout << "Version: " << "\t" << glGetString(GL_VERSION) << std::endl;
-    std::cout << "Extensions: " << "\t" << extensionCount << std::endl;
+    std::ostringstream vendor, renderer, version, extensions;
 
+    vendor << "Vendor: " << glGetString(GL_VENDOR);
+    renderer << "Renderer: " << glGetString(GL_RENDERER);
+    version << "Version: " << glGetString(GL_VERSION);
+    extensions << "Extensions: " << extensionCount;
+
+    Logger::debug(vendor.str());
+    Logger::debug(renderer.str());
+    Logger::debug(version.str());
+    Logger::debug(extensions.str());
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
-
     glEnable(GL_DEPTH_TEST);
+
+    Logger::debug("Enabled Backface Culling (CCW)");
 }
 
 int App::run()
@@ -72,7 +81,7 @@ int App::run()
     FrameCounter fps;
     DebugOutputManager debug;
 
-    std::cout << "Debug Output: \t" << (debug.isAvailable ? "yes" : "no") << std::endl;
+    Logger::debug("Debug Output: " + (debug.isAvailable ? std::string("yes") : std::string("no")));
 
     OBJLoader test{ "./assets/obj/bunny_tri_vnt.obj" };
 
@@ -85,11 +94,11 @@ int App::run()
     Window::cam = &camera;
 
     shader.setUniform("projection", camera.getProjectionMatrix());
+    shader.activate();
 
     float deltaTime = 0.0f;	// Time between current frame and last frame
     float lastFrame = 0.0f; // Time of last frame
 
-    std::cout << shader.ID << std::endl;
     glfwSetCursorPosCallback(window->getWindow(), Window::mouse_callback);
     glfwSetInputMode(window->getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -119,15 +128,7 @@ int App::run()
         glm::mat4 trans = glm::mat4(1.0f);
         trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
         shader.setUniform("transform", trans);
-
-        // Tady si musim nastudovat, co to vlastnì kurva dìlá.
-        // Jako position chápu, front už taky, ale ten up vector je nìjakej zakletej
-        //camera.Pitch = 30.0f;
-
         shader.setUniform("view", camera.getViewMatrix());
-
-        //glm::mat4 projection = glm::mat4(1.0f);
-        //projection = glm::perspective(glm::radians(60.0f), 1920.0f / 1080.0f, 0.1f, 100.0f);
         shader.setUniform("projection", camera.getProjectionMatrix());
 
         mesh.draw(shader);

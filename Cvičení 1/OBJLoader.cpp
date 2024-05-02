@@ -1,8 +1,11 @@
 #pragma once
+#include <sstream>
+#include "Logger.h"
 #include "Vertex.h"
 #include "Mesh.h"
 #include "OBJLoader.h"
 #include "StringUtils.h"
+
 
 OBJLoader::OBJLoader(const std::filesystem::path& filename)
 {
@@ -11,14 +14,14 @@ OBJLoader::OBJLoader(const std::filesystem::path& filename)
 	std::vector< glm::vec2 > temp_uvs;
 	std::vector< glm::vec3 > temp_normals;
 
-	std::cout << "Loading model: " << filename.string() << std::endl;
+	Logger::info("Loading " + filename.string());
 
 	FILE* file;
 	fopen_s(&file, filename.string().c_str(), "r");
 
 	// Kontrola existence souboru
 	if (file == NULL) {
-		printf("Impossible to open the file !\n");
+		Logger::error("File " + filename.string() + " does not exists!");
 		return;
 	}
 
@@ -59,7 +62,6 @@ OBJLoader::OBJLoader(const std::filesystem::path& filename)
 			rtrim(line);
 			
 			face_index += 1;
-			//std::cout << "Face index: " << face_index << std::endl;
 
 			int vertexIndex[4], uvIndex[4], normalIndex[4];
 			std::vector<std::string> _tokens = split(line, ' ');
@@ -121,15 +123,20 @@ OBJLoader::OBJLoader(const std::filesystem::path& filename)
 		}
 	}
 
-	std::cout << "V: " << temp_vertices.size() << std::endl;
-	std::cout << "U: " << temp_uvs.size() << std::endl;
-	std::cout << "N: " << temp_normals.size() << std::endl;
-	std::cout << std::endl << std::endl;
+	std::ostringstream statistics, indicies;
 
-	std::cout << "V_I: " << vertexIndices.size() << std::endl;
-	std::cout << "U_I: " << uvIndices.size() << std::endl;
-	std::cout << "N_I: " << normalIndices.size() << std::endl;
-	std::cout << std::endl;
+	Logger::info("Parsed model " + filename.string());
+
+	statistics << "Vertices: " << temp_vertices.size() << ", ";
+	statistics << "UVs: " << temp_uvs.size() << ", ";
+	statistics << "Normals: " << temp_normals.size();
+
+	indicies << "Vertex Indicies: " << vertexIndices.size() << ", ";
+	indicies << "UV Indicies: " << uvIndices.size() << ", ";
+	indicies << "Normal Indicies: " << normalIndices.size();
+
+	Logger::debug("Model Stats: " + statistics.str());
+	Logger::debug("Model Indicies:" + indicies.str());
 
 	// unroll from indirect to direct vertex specification
 	// sometimes not necessary, definitely not optimal
@@ -178,6 +185,5 @@ Mesh OBJLoader::getMesh()
 		vertexes.push_back(vertex);
 	}
 
-	std::cout << "V: " << vertices.size() << "\tI: " << indices.size() << std::endl;
 	return Mesh(GL_TRIANGLES, vertexes, indices, 0);
 }

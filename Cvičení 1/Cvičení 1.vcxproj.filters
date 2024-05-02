@@ -75,6 +75,9 @@
     <ClCompile Include="imgui\imgui_tables.cpp">
       <Filter>Zdrojové soubory\imgui</Filter>
     </ClCompile>
+    <ClCompile Include="Logger.cpp">
+      <Filter>Zdrojové soubory</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h">
@@ -139,6 +142,9 @@
     </ClInclude>
     <ClInclude Include="imgui\imstb_textedit.h">
       <Filter>Hlavičkové soubory\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Logger.h">
+      <Filter>Hlavičkové soubory</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
