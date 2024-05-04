@@ -130,6 +130,7 @@ Mesh OBJLoader::getMesh()
 	instance.ambient = materials["Color"].ambient;
 	instance.diffuse = materials["Color"].diffuse;
 	instance.specular = materials["Color"].specular;
+	instance.shininess = materials["Color"].shininess;
 
 	return instance;
 }

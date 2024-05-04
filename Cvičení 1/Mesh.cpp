@@ -56,9 +56,9 @@ void Mesh::draw(Shader& shader)
 
 	//TODO: draw mesh: bind vertex array object, draw all elements with selected primitive type, unbind vertex array object 
 
-	shader.setUniform("ambient", ambient);
-	shader.setUniform("diffuse", diffuse);
-	shader.setUniform("specular", specular);
+	//shader.setUniform("ambient", ambient);
+	
+	//shader.setUniform("specular", specular);
 
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
