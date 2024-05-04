@@ -83,7 +83,7 @@ int App::run()
 
     Logger::debug("Debug Output: " + (debug.isAvailable ? std::string("yes") : std::string("no")));
 
-    OBJLoader test{ "./assets/obj/bunny_tri_vnt.obj" };
+    OBJLoader test{ "./assets/obj/coin.obj" };
 
     auto camera = Camera{ glm::vec3(0.0f, 0.0f, 0.0f) };
     auto mesh = test.getMesh();

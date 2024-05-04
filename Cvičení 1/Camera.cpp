@@ -53,7 +53,6 @@ void Camera::onKeyboardEvent(GLFWwindow* window, GLfloat deltaTime)
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
 		this->Position += glm::normalize(glm::cross(this->Front, this->Up)) * cameraSpeed;
 	}
-
 }
 
 void Camera::onMouseEvent(GLfloat xoffset, GLfloat yoffset, GLboolean constraintPitch = GL_TRUE)
