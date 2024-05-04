@@ -1,23 +1,24 @@
 ﻿#pragma once
 #include <sstream>
+#include <numeric>
 #include "Logger.h"
 #include "Vertex.h"
 #include "Mesh.h"
 #include "OBJLoader.h"
 #include "StringUtils.h"
 
-OBJLoader::OBJLoader(const std::filesystem::path& filename)
+OBJLoader::OBJLoader(const std::filesystem::path& modelFilename)
 {
 	std::vector< unsigned int > vertexIndices, uvIndices, normalIndices;
 	std::vector<glm::vec3> temp_vertices;
 	std::vector<glm::vec2> temp_uvs;
 	std::vector<glm::vec3> temp_normals;
 
-	Logger::info("Loading " + filename.string());
+	Logger::info("Loading " + modelFilename.string());
 
-	std::ifstream file(filename);
+	std::ifstream file(modelFilename);
 	if (!file.is_open()) {
-		Logger::error("File " + filename.string() + " does not exist!");
+		Logger::error("File " + modelFilename.string() + " does not exist!");
 		return;
 	}
 
@@ -37,7 +38,7 @@ OBJLoader::OBJLoader(const std::filesystem::path& filename)
 		// Comments
 		if (header == "#") continue;
 		// Texture definition
-		else if (header == "mtllib") OBJLoader::Parse::MTL(tokens);
+		else if (header == "mtllib") OBJLoader::Parse::MTL(tokens, modelFilename.parent_path().string(), materials);
 		// Vertices definition
 		else if (header == "v") OBJLoader::Parse::vertex(tokens, temp_vertices);
 		// UVs definition
@@ -46,22 +47,29 @@ OBJLoader::OBJLoader(const std::filesystem::path& filename)
 		else if (header == "vn") OBJLoader::Parse::normal(tokens, temp_normals);
 		// Faces
 		else if (header == "f") OBJLoader::Parse::face(tokens, vertexIndices, uvIndices, normalIndices);
+		//TODO
+		else if (header == "usemtl") {}
 	}
 
-	std::ostringstream statistics, indicies;
+	std::ostringstream statistics, indicies, mat;
 
-	Logger::info("Parsed model " + filename.string());
+	Logger::info("Parsed model " + modelFilename.string());
 
 	statistics << "Vertices: " << temp_vertices.size() << ", ";
 	statistics << "UVs: " << temp_uvs.size() << ", ";
 	statistics << "Normals: " << temp_normals.size();
 
-	indicies << "Vertex Indicies: " << vertexIndices.size() << ", ";
-	indicies << "UV Indicies: " << uvIndices.size() << ", ";
-	indicies << "Normal Indicies: " << normalIndices.size();
+	indicies << "Vertices: " << vertexIndices.size() << ", ";
+	indicies << "UVs: " << uvIndices.size() << ", ";
+	indicies << "Normals: " << normalIndices.size();
 
-	Logger::debug("Model Stats: " + statistics.str());
-	Logger::debug("Model Indicies: " + indicies.str());
+	for (auto i = materials.begin(); i != materials.end(); ++i) {
+		mat << i->first << " ";
+	}
+
+	Logger::debug("Model Primitives: \t" + statistics.str());
+	Logger::debug("Model Indicies: \t" + indicies.str());
+	Logger::debug("Model Materials: \t" + mat.str());
 
 	// unroll from indirect to direct vertex specification
 	// sometimes not necessary, definitely not optimal
@@ -116,7 +124,14 @@ Mesh OBJLoader::getMesh()
 		vertexes.push_back(vertex);
 	}
 
-	return Mesh(GL_TRIANGLES, vertexes, indices, 0);
+	auto instance = Mesh(GL_TRIANGLES, vertexes, indices, 0);
+
+	// Hardcoded test
+	instance.ambient = materials["Color"].ambient;
+	instance.diffuse = materials["Color"].diffuse;
+	instance.specular = materials["Color"].specular;
+
+	return instance;
 }
 
 /**
@@ -181,7 +196,7 @@ void OBJLoader::Parse::normal(std::vector<std::string> input, std::vector<glm::v
 /**
  * @brief Parses a face definition from the input data and extracts vertex indices, texture coordinate indices, and normal indices.
  *
- * This function parses a face definition represented by a vector of strings, extracts the vertex indices, texture coordinate indices, and normal indices, and stores them in separate vectors. Each string in the input vector represents a vertex, texture coordinate, and normal triplet in the format "vertex_index/texture_index/normal_index". In some cases, the triplet does not have to be complete nor be triplet at all. Allowed formats also include vertex_index, vertex_index//norma_index, etc...
+ * This function parses a face definition represented by a vector of strings, extracts the vertex indices, texture coordinate indices, and normal indices, and stores them in separate vectors. Each string in the input vector represents a vertex, texture coordinate, and normal triplet in the format "vertex_index/texture_index/normal_index". In some cases, the triplet does not have to be complete nor be triplet at all. Allowed formats also include, but are not limited to: vertex_index, vertex_index//norma_index, etc...
  *
  * @param input A vector of strings representing the face data. Each string should contain vertex, texture coordinate, and normal indices separated by slashes (/).
  * @param vertices_i An output vector to store the parsed vertex indices.
@@ -245,53 +260,110 @@ void OBJLoader::Parse::face(std::vector<std::string> input, std::vector<unsigned
 	}
 }
 
-std::vector<Material> OBJLoader::Parse::MTL(std::vector<std::string> input)
+/**
+ * @brief Parses material data from the input and appends it to the specified vector of Material objects.
+ *
+ * This function parses material data from the input vector of strings, representing an path to a MTL file, and appends the parsed materials to the specified vector of Material objects.
+ * The input vector are tokens of path to an MTL file, potentionally delimited by whitespace.
+ * This function takes only a first element of the input vector into account.
+ * The function iterates over each line of the MTL file, parsing the material properties and creating Material objects accordingly.
+ * The parsed materials are appended to the output vector.
+ *
+ * @param input A vector of strings representing path(s) to an MTL file.
+ * @param path The path to the directory containing the MTL file.
+ * @param output A reference to the vector of Material objects to which the parsed materials will be appended.
+ */
+void OBJLoader::Parse::MTL(std::vector<std::string> input, std::string path, std::unordered_map<std::string, Material>& materials)
 {
-	std::vector<Material> materials;
-
 	if (input.empty()) {
 		Logger::error("Object has 'mtllib' line defined, but no path to MTL file was found.");
-		return materials;
+		return;
 	}
 
-	std::string filename = input.front();
+	std::string filename = path + "/" + input.front();
 	std::ifstream file(filename);
 
 	if (!file.is_open()) {
 		Logger::error("Unable to open file " + filename);
-		return materials;
+		return;
 	}
 
 	Material currentMaterial;
 	std::string line;
 	while (std::getline(file, line)) {
-		std::istringstream iss(line);
-		std::string token;
-		iss >> token;
+		std::vector<std::string> tokens = split(line, ' ');
 
-		if (token == "newmtl") {
-			if (!currentMaterial.name.empty()) {
-				materials.push_back(currentMaterial);
-				currentMaterial = Material();
-			}
-			iss >> currentMaterial.name;
+		// If the line is empty for some reason, we skip it.
+		// This should not happen, but better be safe than sorry.
+		if (tokens.empty()) continue;
+
+		// Get the line header
+		std::string header = tokens.front();
+		tokens.erase(tokens.begin());
+
+		if (header == "newmtl") {
+			if (!currentMaterial.name.empty()) materials[currentMaterial.name] = currentMaterial;
+			currentMaterial = Material();
+			currentMaterial.name = tokens[0];
 		}
-		else if (token == "Ka") {
-			iss >> currentMaterial.ambient[0] >> currentMaterial.ambient[1] >> currentMaterial.ambient[2];
-		}
-		else if (token == "Kd") {
-			iss >> currentMaterial.diffuse[0] >> currentMaterial.diffuse[1] >> currentMaterial.diffuse[2];
-		}
-		else if (token == "Ks") {
-			iss >> currentMaterial.specular[0] >> currentMaterial.specular[1] >> currentMaterial.specular[2];
-		}
-		else if (token == "Ns") {
-			iss >> currentMaterial.shininess;
+		else if (header == "Ka") OBJLoader::Parse::ambient(tokens, currentMaterial);
+		else if (header == "Kd") OBJLoader::Parse::diffuse(tokens, currentMaterial);
+		else if (header == "Ks") OBJLoader::Parse::specular(tokens, currentMaterial);
+		else if (header == "Ns") {
+			currentMaterial.shininess = std::stof(tokens[0]);
 		}
 	}
-	if (!currentMaterial.name.empty()) {
-		materials.push_back(currentMaterial);
-	}
 
-	return materials;
+	if (!currentMaterial.name.empty()) materials[currentMaterial.name] = currentMaterial;
+}
+
+/**
+ * @brief Parses ambient color data from the input and assigns it to the specified Material object.
+ *
+ * This function parses ambient color data from the input vector of strings and assigns it to the specified Material object.
+ * The input vector should contain three strings representing the red, green, and blue components of the ambient color, respectively.
+ * The ambient color components are converted to floating-point values and assigned to the corresponding elements of the Material's ambient array.
+ *
+ * @param input A vector of strings representing the ambient color data. The first string should represent the red component, the second string the green component, and the third string the blue component.
+ * @param output A reference to the Material object to which the parsed ambient color data will be assigned.
+ */
+void OBJLoader::Parse::ambient(std::vector<std::string> input, Material& output)
+{
+	output.ambient[0] = std::stof(input[0]);
+	output.ambient[1] = std::stof(input[1]);
+	output.ambient[2] = std::stof(input[2]);
+}
+
+/**
+ * @brief Parses diffuse color data from the input and assigns it to the specified Material object.
+ *
+ * This function parses diffuse color data from the input vector of strings and assigns it to the specified Material object.
+ * The input vector should contain three strings representing the red, green, and blue components of the diffuse color, respectively.
+ * The diffuse color components are converted to floating-point values and assigned to the corresponding elements of the Material's diffuse array.
+ *
+ * @param input A vector of strings representing the diffuse color data. The first string should represent the red component, the second string the green component, and the third string the blue component.
+ * @param output A reference to the Material object to which the parsed diffuse color data will be assigned.
+ */
+void OBJLoader::Parse::diffuse(std::vector<std::string> input, Material& output)
+{
+	output.diffuse[0] = std::stof(input[0]);
+	output.diffuse[1] = std::stof(input[1]);
+	output.diffuse[2] = std::stof(input[2]);
+}
+
+/**
+ * @brief Parses specular color data from the input and assigns it to the specified Material object.
+ *
+ * This function parses specular color data from the input vector of strings and assigns it to the specified Material object.
+ * The input vector should contain three strings representing the red, green, and blue components of the specular color, respectively.
+ * The specular color components are converted to floating-point values and assigned to the corresponding elements of the Material's specular array.
+ *
+ * @param input A vector of strings representing the specular color data. The first string should represent the red component, the second string the green component, and the third string the blue component.
+ * @param output A reference to the Material object to which the parsed specular color data will be assigned.
+ */
+void OBJLoader::Parse::specular(std::vector<std::string> input, Material& output)
+{
+	output.specular[0] = std::stof(input[0]);
+	output.specular[1] = std::stof(input[1]);
+	output.specular[2] = std::stof(input[2]);
 }

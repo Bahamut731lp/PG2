@@ -58,15 +58,11 @@ void App::report(void)
 
     std::ostringstream vendor, renderer, version, extensions;
 
-    vendor << "Vendor: " << glGetString(GL_VENDOR);
-    renderer << "Renderer: " << glGetString(GL_RENDERER);
-    version << "Version: " << glGetString(GL_VERSION);
-    extensions << "Extensions: " << extensionCount;
+    vendor << "Vendor: " << glGetString(GL_VENDOR) << ", " << "rendered with " << glGetString(GL_RENDERER);
+    version << "Version: " << glGetString(GL_VERSION) << ", " << extensionCount << " extensions.";
 
     Logger::debug(vendor.str());
-    Logger::debug(renderer.str());
     Logger::debug(version.str());
-    Logger::debug(extensions.str());
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -81,12 +77,11 @@ int App::run()
     FrameCounter fps;
     DebugOutputManager debug;
 
-    Logger::debug("Debug Output: " + (debug.isAvailable ? std::string("yes") : std::string("no")));
-
-    OBJLoader test{ "./assets/obj/coin.obj" };
+    Logger::debug("OpenGL Debug Output: " + (debug.isAvailable ? std::string("yes") : std::string("no")));
 
     auto camera = Camera{ glm::vec3(0.0f, 0.0f, 0.0f) };
-    auto mesh = test.getMesh();
+    auto mesh = OBJLoader("./assets/obj/coin.obj").getMesh();
+
     auto vertexShaderPath = std::filesystem::path("./assets/shaders/basic.vert");
     auto fragmentShaderPath = std::filesystem::path("./assets/shaders/basic.frag");
     auto shader = Shader(vertexShaderPath, fragmentShaderPath);
