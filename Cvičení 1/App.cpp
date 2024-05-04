@@ -19,6 +19,8 @@
 #include "Mesh.h"
 #include "Shader.h"
 
+#include "SimpleLight.h"
+
 #include "FrameCounter.h"
 #include "DebugOutputManager.h"
 
@@ -84,8 +86,7 @@ int App::run()
     auto mesh = OBJLoader("./assets/obj/coin.obj").getMesh();
     auto meshShader = Shader(std::filesystem::path("./assets/shaders/material.vert"), std::filesystem::path("./assets/shaders/material.frag"));
 
-    auto light = OBJLoader("./assets/obj/cube_triangles.obj").getMesh();
-    auto lightShader = Shader(std::filesystem::path("./assets/shaders/light.vert"), std::filesystem::path("./assets/shaders/light.frag"));
+    auto simpleLight = SimpleLight(glm::vec3(1.0f), 1.0f);
 
     Window::cam = &camera;
     glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
@@ -123,16 +124,11 @@ int App::run()
         // Draw scene
         
         // Moving light
-        glm::vec3 lightColor;
-        lightColor.x = static_cast<float>(sin(glfwGetTime() * 2.0));
-        lightColor.y = static_cast<float>(sin(glfwGetTime() * 0.7));
-        lightColor.z = static_cast<float>(sin(glfwGetTime() * 1.3));
-
         meshShader.activate();
-        meshShader.setUniform("light.position", lightPos);
-        meshShader.setUniform("light.ambient", glm::vec3(0.2f));
-        meshShader.setUniform("light.diffuse", glm::vec3(0.5f));
-        meshShader.setUniform("light.specular", glm::vec3(1.0f));
+        meshShader.setUniform("light.position", simpleLight.position);
+        meshShader.setUniform("light.ambient", simpleLight.ambient);
+        meshShader.setUniform("light.diffuse", simpleLight.diffusion);
+        meshShader.setUniform("light.specular", simpleLight.specular);
 
         meshShader.setUniform("material.ambient", mesh.ambient);
         meshShader.setUniform("material.diffuse", mesh.diffuse);
@@ -146,20 +142,8 @@ int App::run()
         meshShader.setUniform("view", camera.getViewMatrix());
         meshShader.setUniform("projection", camera.getProjectionMatrix());
 
-        lightShader.activate();
-        lightShader.setUniform("projection", camera.getProjectionMatrix());
-        lightShader.setUniform("view", camera.getViewMatrix());
-        lightPos.x = 1.0f + sin(glfwGetTime()) * 2.0f;
-        lightPos.y = sin(glfwGetTime() / 2.0f) * 1.0f;
-
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, lightPos);
-        model = glm::scale(model, glm::vec3(0.3f));
-
-        lightShader.setUniform("transform", model);
-
         mesh.draw(meshShader);
-        light.draw(lightShader);
+        simpleLight.render(camera);
 
         // Draw HUD
         ImGui::SetNextWindowSize(ImVec2(200, ImGui::GetTextLineHeightWithSpacing() * 3));
