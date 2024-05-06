@@ -38,6 +38,8 @@ Window::Window(int width, int height, const char* title, bool fullscreen, bool v
 
     glfwSetKeyCallback(window, key_callback);
     glfwSetScrollCallback(window, scroll_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
+
     this->setVsync(vsync);
 }
 
@@ -129,6 +131,13 @@ void Window::handle_key_press(int key, int action) {
             Logger::info("VSync " + std::string(vsync ? "enabled" : "disabled"));
             break;
         }
+    }
+}
+
+void Window::mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        Logger::info("Mouse Click Event Fired.");
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     }
 }
 
