@@ -87,11 +87,11 @@
     <ClCompile Include="SimpleLight.cpp">
       <Filter>Zdrojové soubory\Lights</Filter>
     </ClCompile>
-    <ClCompile Include="DirectionalLight.cpp">
-      <Filter>Zdrojové soubory\Lights</Filter>
-    </ClCompile>
     <ClCompile Include="OBJLoader.cpp">
       <Filter>Zdrojové soubory\Loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Zdrojové soubory</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -155,14 +155,14 @@
     <ClInclude Include="SimpleLight.h">
       <Filter>Hlavičkové soubory\Lights</Filter>
     </ClInclude>
-    <ClInclude Include="DirectionalLight.h">
-      <Filter>Hlavičkové soubory\Lights</Filter>
-    </ClInclude>
     <ClInclude Include="OBJLoader.h">
       <Filter>Hlavičkové soubory\Loaders</Filter>
     </ClInclude>
-    <ClInclude Include="Loader.h">
-      <Filter>Hlavičkové soubory\Loaders</Filter>
+    <ClInclude Include="Model.h">
+      <Filter>Hlavičkové soubory</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Hlavičkové soubory</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -19,6 +19,8 @@
 #include "Mesh.h"
 #include "Shader.h"
 
+#include "Model.h"
+
 #include "SimpleLight.h"
 
 #include "FrameCounter.h"
@@ -83,13 +85,18 @@ int App::run()
 
     auto camera = Camera{ glm::vec3(0.0f, 15.0f, 0.0f) };
 
-    auto mesh = OBJLoader("./assets/obj/coin.obj").getMesh();
+    auto gate = Model("./assets/obj/gate.obj");
+    auto gateShader = Shader(std::filesystem::path("./assets/shaders/material.vert"), std::filesystem::path("./assets/shaders/material.frag"));
+    //gate.scale = glm::vec3(0.5f);
+    
+
+    auto coin = Model("./assets/obj/coin.obj");
     auto meshShader = Shader(std::filesystem::path("./assets/shaders/material.vert"), std::filesystem::path("./assets/shaders/material.frag"));
 
-    auto terrain = OBJLoader("./assets/obj/level_1.obj").getMesh();
+    auto terrain = Model("./assets/obj/level_1.obj");
     auto terrainShader = Shader(std::filesystem::path("./assets/shaders/material.vert"), std::filesystem::path("./assets/shaders/material.frag"));
 
-    auto simpleLight = SimpleLight(glm::vec3(1.0f, 25.0f, 0.0f), 1.0f);
+    auto simpleLight = SimpleLight(glm::vec3(1.0f, 10.0f, -10.0f), 5.0f);
 
     Window::cam = &camera;
 
@@ -126,44 +133,45 @@ int App::run()
         // Draw scene
         
         // Moving light
-        meshShader.activate();
-        meshShader.setUniform("light.position", simpleLight.position);
-        meshShader.setUniform("light.ambient", simpleLight.ambient);
-        meshShader.setUniform("light.diffuse", simpleLight.diffusion);
-        meshShader.setUniform("light.specular", simpleLight.specular);
 
-        meshShader.setUniform("material.ambient", mesh.ambient);
-        meshShader.setUniform("material.diffuse", mesh.diffuse);
-        meshShader.setUniform("material.specular", mesh.specular); // specular lighting doesn't have full effect on this object's material
-        meshShader.setUniform("material.shininess", mesh.shininess);
+        // Gate
+        gateShader.activate();
+        gateShader.setUniform("light.position", simpleLight.position);
+        gateShader.setUniform("light.ambient", simpleLight.ambient);
+        gateShader.setUniform("light.diffuse", simpleLight.diffusion);
+        gateShader.setUniform("light.specular", simpleLight.specular);
+        gateShader.setUniform("light.constant", 1.0f);
+        gateShader.setUniform("light.linear", 0.09f);
+        gateShader.setUniform("light.quadratic", 0.032f);
 
         auto model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 10.0f, 0.0f));
         model = glm::scale(model, glm::vec3(0.5f));
-        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::rotate(model, (float)glfwGetTime() / 4, glm::vec3(0.0f, 1.0f, 0.0f));
 
-        meshShader.setUniform("transform", model);
-        meshShader.setUniform("view", camera.getViewMatrix());
-        meshShader.setUniform("projection", camera.getProjectionMatrix());
+        gateShader.setUniform("transform", model);
+        gateShader.setUniform("view", camera.getViewMatrix());
+        gateShader.setUniform("projection", camera.getProjectionMatrix());
 
+        // Terrain
         terrainShader.activate();
         terrainShader.setUniform("light.position", simpleLight.position);
         terrainShader.setUniform("light.ambient", simpleLight.ambient);
         terrainShader.setUniform("light.diffuse", simpleLight.diffusion);
         terrainShader.setUniform("light.specular", simpleLight.specular);
-
-        terrainShader.setUniform("material.ambient", terrain.ambient);
-        terrainShader.setUniform("material.diffuse", terrain.diffuse);
-        terrainShader.setUniform("material.specular", terrain.specular);
-        terrainShader.setUniform("material.shininess", terrain.shininess);
+        terrainShader.setUniform("light.constant", 1.0f);
+        terrainShader.setUniform("light.linear", 0.5f);
+        terrainShader.setUniform("light.quadratic", 0.0019f);
 
         terrainShader.setUniform("transform", glm::mat4(1.0f));
         terrainShader.setUniform("view", camera.getViewMatrix());
         terrainShader.setUniform("projection", camera.getProjectionMatrix());
 
-        terrain.draw(terrainShader);
-        mesh.draw(meshShader);
         simpleLight.render(camera);
+
+        terrain.render(terrainShader);
+        coin.render(gateShader);
+        gate.render(gateShader);
 
         // Draw HUD
         ImGui::SetNextWindowSize(ImVec2(200, ImGui::GetTextLineHeightWithSpacing() * 3));

@@ -87,6 +87,7 @@ bool Window::isFullscreen() const {
 
 // Static key callback function
 void Window::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+
     // glfwGetWindowUserPointer() vytáhne z okna custom pointer, který je k nìmu pøiøazen
     // v našem pøípadì jsem k tomu pøidadil instanci tøídy Window v jejím konstruktoru
     // static_cast<Window*> je type_casting syntax (pøevod datového typu) - tím my c++ øekneme, že ten pointer je na tøídu Window
@@ -94,6 +95,7 @@ void Window::key_callback(GLFWwindow* window, int key, int scancode, int action,
     if (instance) {
         instance->onKeyEvent(key, action);
     }
+
 }
 
 /*
