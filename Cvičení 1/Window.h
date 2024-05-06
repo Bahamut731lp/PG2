@@ -26,6 +26,14 @@ public:
     bool isFullscreen() const;
     GLFWwindow* getWindow() const;
 
+    // Window position & size restoration
+    int lastWindowX;
+    int lastWindowY;
+    int lastWindowWidth;
+    int lastWindowHeight;
+
+
+    // Variables for camera movement
     static Camera* cam;
     static bool isMouseMoved;
     static float lastX;

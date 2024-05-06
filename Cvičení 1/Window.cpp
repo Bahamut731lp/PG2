@@ -10,7 +10,13 @@ bool Window::isMouseMoved = false;
 Camera* Window::cam = nullptr;
 
 Window::Window(int width, int height, const char* title, bool fullscreen, bool vsync)
-    : fullscreen(fullscreen), vsync(vsync) {
+    : fullscreen(fullscreen), vsync(vsync)
+{
+    lastWindowX = 0;
+    lastWindowY = 0;
+    lastWindowWidth = width;
+    lastWindowHeight = height;
+
 
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW\n";
@@ -57,11 +63,14 @@ void Window::setFullscreen(bool fullscreen) {
     if (fullscreen) {
         GLFWmonitor* monitor = glfwGetPrimaryMonitor();
         const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
+        glfwGetWindowPos(window, &lastWindowX, &lastWindowY);
+        glfwGetWindowSize(window, &lastWindowWidth, &lastWindowHeight);
         glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, GLFW_DONT_CARE);
     }
     else {
         const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        glfwSetWindowMonitor(window, nullptr, 150, 150, mode->width / 2, mode->height / 2, GLFW_DONT_CARE);
+        glfwSetWindowMonitor(window, nullptr, lastWindowX, lastWindowY, lastWindowWidth, lastWindowHeight, GLFW_DONT_CARE);
     }
 }
 
