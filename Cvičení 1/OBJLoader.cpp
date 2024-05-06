@@ -8,7 +8,7 @@
 #include "OBJLoader.h"
 #include "StringUtils.h"
 
-struct WannabeMesh {
+struct MeshContainer {
 	std::vector< unsigned int > vertices;
 	std::vector< unsigned int > uvs;
 	std::vector< unsigned int > normals;
@@ -21,8 +21,8 @@ OBJLoader::OBJLoader(const std::filesystem::path& modelFilename)
 	std::vector<glm::vec2> temp_uvs;
 	std::vector<glm::vec3> temp_normals;
 
-	std::vector<WannabeMesh> parts;
-	auto basic = WannabeMesh();
+	std::vector<MeshContainer> parts;
+	auto basic = MeshContainer();
 	parts.push_back(basic);
 
 	Logger::info("Loading " + modelFilename.string());
@@ -63,9 +63,8 @@ OBJLoader::OBJLoader(const std::filesystem::path& modelFilename)
 			// Here we cope that the material exists
 			// TODO: Handle errors here
 			auto material = materials[tokens[0]];
-			auto test = WannabeMesh();
+			auto test = MeshContainer();
 			test.material = material;
-			usedMaterial = material;
 
 			Logger::debug("Creating Material Submesh: " + tokens[0]);
 
@@ -73,7 +72,7 @@ OBJLoader::OBJLoader(const std::filesystem::path& modelFilename)
 		}
 	}
 
-	std::ostringstream statistics, indicies, mat;
+	std::ostringstream statistics, mat;
 
 	Logger::info("Parsed model " + modelFilename.string());
 	Logger::info("Model Parts: " + std::to_string(parts.size()));
@@ -87,10 +86,9 @@ OBJLoader::OBJLoader(const std::filesystem::path& modelFilename)
 	}
 
 	Logger::debug("Model Primitives: \t" + statistics.str());
-	Logger::debug("Model Indicies: \t" + indicies.str());
 	Logger::debug("Model Materials: \t" + mat.str());
 
-	for (WannabeMesh mesh : parts) {
+	for (MeshContainer mesh : parts) {
 		if (mesh.vertices.empty()) continue;
 
 		//Hey, i know it's spelled wrong.
@@ -138,28 +136,6 @@ OBJLoader::OBJLoader(const std::filesystem::path& modelFilename)
 		instance.material = mesh.material;
 		submeshes.push_back(instance);
 	}
-}
-
-/**
- * @brief Retrieves the mesh data parsed by the OBJLoader.
- *
- * This function returns the mesh data parsed by the OBJLoader as a Mesh object.
- * The Mesh object contains information about vertices, texture coordinates, normals, and faces that make up the mesh.
- *
- * @return A Mesh object containing the parsed mesh data.
- */
-Mesh OBJLoader::getMesh()
-{
-	
-	auto instance = submeshes.front();
-
-	// Hardcoded test
-	instance.ambient = usedMaterial.ambient;
-	instance.diffuse = usedMaterial.diffuse;
-	instance.specular = usedMaterial.specular;
-	instance.shininess = usedMaterial.shininess;
-
-	return instance;
 }
 
 /**

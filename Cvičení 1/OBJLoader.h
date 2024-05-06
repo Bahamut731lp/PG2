@@ -11,7 +11,6 @@ class OBJLoader
 {
 public:
     OBJLoader(const std::filesystem::path& filename);
-	Mesh getMesh();
 
     std::vector< glm::vec3 > vertices;
     std::vector< glm::vec2 > uvs;
@@ -36,6 +35,5 @@ public:
 
 private:
     std::unordered_map<std::string, Material> materials;
-    Material usedMaterial;
 };
 
