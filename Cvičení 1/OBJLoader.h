@@ -13,6 +13,7 @@ struct Material {
 
 /*
 	Loader pro formát modelù .obj
+    Currently uses only last mentioned material, that is TODO
 */
 class OBJLoader : public Loader
 {
@@ -37,5 +38,6 @@ public:
 
 private:
     std::unordered_map<std::string, Material> materials;
+    Material usedMaterial;
 };
 

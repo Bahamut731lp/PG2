@@ -81,15 +81,17 @@ int App::run()
 
     Logger::debug("OpenGL Debug Output: " + (debug.isAvailable ? std::string("yes") : std::string("no")));
 
-    auto camera = Camera{ glm::vec3(0.0f, 0.0f, 0.0f) };
+    auto camera = Camera{ glm::vec3(0.0f, 15.0f, 0.0f) };
 
     auto mesh = OBJLoader("./assets/obj/coin.obj").getMesh();
     auto meshShader = Shader(std::filesystem::path("./assets/shaders/material.vert"), std::filesystem::path("./assets/shaders/material.frag"));
 
-    auto simpleLight = SimpleLight(glm::vec3(1.0f), 1.0f);
+    auto terrain = OBJLoader("./assets/obj/level_1.obj").getMesh();
+    auto terrainShader = Shader(std::filesystem::path("./assets/shaders/material.vert"), std::filesystem::path("./assets/shaders/material.frag"));
+
+    auto simpleLight = SimpleLight(glm::vec3(1.0f, 25.0f, 0.0f), 1.0f);
 
     Window::cam = &camera;
-    glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
     float deltaTime = 0.0f;	// Time between current frame and last frame
     float lastFrame = 0.0f; // Time of last frame
@@ -136,12 +138,30 @@ int App::run()
         meshShader.setUniform("material.shininess", mesh.shininess);
 
         auto model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, 10.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(0.5f));
         model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
 
         meshShader.setUniform("transform", model);
         meshShader.setUniform("view", camera.getViewMatrix());
         meshShader.setUniform("projection", camera.getProjectionMatrix());
 
+        terrainShader.activate();
+        terrainShader.setUniform("light.position", simpleLight.position);
+        terrainShader.setUniform("light.ambient", simpleLight.ambient);
+        terrainShader.setUniform("light.diffuse", simpleLight.diffusion);
+        terrainShader.setUniform("light.specular", simpleLight.specular);
+
+        terrainShader.setUniform("material.ambient", terrain.ambient);
+        terrainShader.setUniform("material.diffuse", terrain.diffuse);
+        terrainShader.setUniform("material.specular", terrain.specular);
+        terrainShader.setUniform("material.shininess", terrain.shininess);
+
+        terrainShader.setUniform("transform", glm::mat4(1.0f));
+        terrainShader.setUniform("view", camera.getViewMatrix());
+        terrainShader.setUniform("projection", camera.getProjectionMatrix());
+
+        terrain.draw(terrainShader);
         mesh.draw(meshShader);
         simpleLight.render(camera);
 

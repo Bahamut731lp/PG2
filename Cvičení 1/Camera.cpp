@@ -8,7 +8,6 @@
 Camera::Camera(glm::vec3 position)
 	: Position(position)
 {
-	this->Position = glm::vec3(0.0f, 0.0f, 3.0f);
 	this->Front = glm::vec3(0.0f, 0.0f, -1.0f);
 	this->Up = glm::vec3(0.0f, 1.0f, 0.0f);
 	this->Right = glm::vec3(0.0f, 0.0f, 0.0f);

@@ -19,10 +19,16 @@
     <Filter Include="Zdrojové soubory\imgui">
       <UniqueIdentifier>{80d3e220-308f-43ee-9ecd-bb84140b8036}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Hlavičkové soubory\lighting">
+    <Filter Include="Zdrojové soubory\Loaders">
+      <UniqueIdentifier>{486452da-c729-45cc-b801-f9293fd2a18d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hlavičkové soubory\Loaders">
+      <UniqueIdentifier>{4473a9b0-6558-46a0-83dd-bf7c09a8b045}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hlavičkové soubory\Lights">
       <UniqueIdentifier>{8858e9f0-e016-47fa-a14d-b919168f272f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Zdrojové soubory\lighting">
+    <Filter Include="Zdrojové soubory\Lights">
       <UniqueIdentifier>{491218bd-a11e-4da5-83f5-418fd507b4ab}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -46,12 +52,6 @@
       <Filter>Zdrojové soubory</Filter>
     </ClCompile>
     <ClCompile Include="Mesh.cpp">
-      <Filter>Zdrojové soubory</Filter>
-    </ClCompile>
-    <ClCompile Include="OBJLoader.cpp">
-      <Filter>Zdrojové soubory</Filter>
-    </ClCompile>
-    <ClCompile Include="Model.cpp">
       <Filter>Zdrojové soubory</Filter>
     </ClCompile>
     <ClCompile Include="StringUtils.cpp">
@@ -85,7 +85,13 @@
       <Filter>Zdrojové soubory</Filter>
     </ClCompile>
     <ClCompile Include="SimpleLight.cpp">
-      <Filter>Zdrojové soubory\lighting</Filter>
+      <Filter>Zdrojové soubory\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectionalLight.cpp">
+      <Filter>Zdrojové soubory\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="OBJLoader.cpp">
+      <Filter>Zdrojové soubory\Loaders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -108,15 +114,6 @@
       <Filter>Hlavičkové soubory</Filter>
     </ClInclude>
     <ClInclude Include="Mesh.h">
-      <Filter>Hlavičkové soubory</Filter>
-    </ClInclude>
-    <ClInclude Include="OBJLoader.h">
-      <Filter>Hlavičkové soubory</Filter>
-    </ClInclude>
-    <ClInclude Include="Loader.h">
-      <Filter>Hlavičkové soubory</Filter>
-    </ClInclude>
-    <ClInclude Include="Model.h">
       <Filter>Hlavičkové soubory</Filter>
     </ClInclude>
     <ClInclude Include="StringUtils.h">
@@ -156,7 +153,16 @@
       <Filter>Hlavičkové soubory</Filter>
     </ClInclude>
     <ClInclude Include="SimpleLight.h">
-      <Filter>Hlavičkové soubory\lighting</Filter>
+      <Filter>Hlavičkové soubory\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionalLight.h">
+      <Filter>Hlavičkové soubory\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="OBJLoader.h">
+      <Filter>Hlavičkové soubory\Loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Loader.h">
+      <Filter>Hlavičkové soubory\Loaders</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

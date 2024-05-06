@@ -25,6 +25,6 @@ public:
 
 private:
 	Shader shader{ "./assets/shaders/light.vert", "./assets/shaders/light.frag" };
-	Mesh mesh = OBJLoader{ "./assets/obj/cube_triangles" }.getMesh();
+	Mesh mesh = OBJLoader{ "./assets/obj/cube_triangles.obj" }.getMesh();
 };
 

@@ -16,16 +16,13 @@ SimpleLight::SimpleLight(glm::vec3 position, float intensity) : position(positio
 
 void SimpleLight::render(Camera& camera)
 {
-	shader.activate();
-	shader.setUniform("projection", camera.getProjectionMatrix());
-	shader.setUniform("view", camera.getViewMatrix());
-	position.x = 1.0f + sin(glfwGetTime()) * 2.0f;
-	position.y = sin(glfwGetTime() / 2.0f) * 1.0f;
-
 	auto model = glm::mat4(1.0f);
 	model = glm::translate(model, position);
 	model = glm::scale(model, glm::vec3(0.3f));
 
+	shader.activate();
 	shader.setUniform("transform", model);
+	shader.setUniform("projection", camera.getProjectionMatrix());
+	shader.setUniform("view", camera.getViewMatrix());
 	mesh.draw(shader);
 }

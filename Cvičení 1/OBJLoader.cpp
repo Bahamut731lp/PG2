@@ -48,7 +48,11 @@ OBJLoader::OBJLoader(const std::filesystem::path& modelFilename)
 		// Faces
 		else if (header == "f") OBJLoader::Parse::face(tokens, vertexIndices, uvIndices, normalIndices);
 		//TODO
-		else if (header == "usemtl") {}
+		else if (header == "usemtl") {
+			// Here we cope that the material exists
+			// TODO: Handle errors here
+			usedMaterial = materials[tokens[0]];
+		}
 	}
 
 	std::ostringstream statistics, indicies, mat;
@@ -127,10 +131,10 @@ Mesh OBJLoader::getMesh()
 	auto instance = Mesh(GL_TRIANGLES, vertexes, indices, 0);
 
 	// Hardcoded test
-	instance.ambient = materials["Color"].ambient;
-	instance.diffuse = materials["Color"].diffuse;
-	instance.specular = materials["Color"].specular;
-	instance.shininess = materials["Color"].shininess;
+	instance.ambient = usedMaterial.ambient;
+	instance.diffuse = usedMaterial.diffuse;
+	instance.specular = usedMaterial.specular;
+	instance.shininess = usedMaterial.shininess;
 
 	return instance;
 }
