@@ -83,18 +83,16 @@ int App::run()
 
     Logger::debug("OpenGL Debug Output: " + (debug.isAvailable ? std::string("yes") : std::string("no")));
 
+    auto materialShader = Shader(std::filesystem::path("./assets/shaders/material.vert"), std::filesystem::path("./assets/shaders/material.frag"));
+    auto meshShader = Shader(std::filesystem::path("./assets/shaders/material.vert"), std::filesystem::path("./assets/shaders/material.frag"));
+    auto terrainShader = Shader(std::filesystem::path("./assets/shaders/material.vert"), std::filesystem::path("./assets/shaders/material.frag"));
+    
+    
     auto camera = Camera{ glm::vec3(0.0f, 15.0f, 0.0f) };
 
     auto gate = Model("./assets/obj/gate.obj");
-    auto gateShader = Shader(std::filesystem::path("./assets/shaders/material.vert"), std::filesystem::path("./assets/shaders/material.frag"));
-    //gate.scale = glm::vec3(0.5f);
-    
-
     auto coin = Model("./assets/obj/coin.obj");
-    auto meshShader = Shader(std::filesystem::path("./assets/shaders/material.vert"), std::filesystem::path("./assets/shaders/material.frag"));
-
     auto terrain = Model("./assets/obj/level_1.obj");
-    auto terrainShader = Shader(std::filesystem::path("./assets/shaders/material.vert"), std::filesystem::path("./assets/shaders/material.frag"));
 
     auto simpleLight = SimpleLight(glm::vec3(1.0f, 10.0f, -10.0f), 5.0f);
 
@@ -105,6 +103,28 @@ int App::run()
 
     glfwSetCursorPosCallback(window->getWindow(), Window::mouse_callback);
     glfwSetInputMode(window->getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    gate.transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 10.0f, 0.0f));
+    gate.transform = glm::scale(gate.transform, glm::vec3(0.5f));
+
+    // The light is not moving, so we do not have to update position in shader every frame
+    materialShader.activate();
+    materialShader.setUniform("light.position", simpleLight.position);
+    materialShader.setUniform("light.ambient", simpleLight.ambient);
+    materialShader.setUniform("light.diffuse", simpleLight.diffusion);
+    materialShader.setUniform("light.specular", simpleLight.specular);
+    materialShader.setUniform("light.constant", 1.0f);
+    materialShader.setUniform("light.linear", 0.09f);
+    materialShader.setUniform("light.quadratic", 0.032f);
+
+    terrainShader.activate();
+    terrainShader.setUniform("light.position", simpleLight.position);
+    terrainShader.setUniform("light.ambient", simpleLight.ambient);
+    terrainShader.setUniform("light.diffuse", simpleLight.diffusion);
+    terrainShader.setUniform("light.specular", simpleLight.specular);
+    terrainShader.setUniform("light.constant", 1.0f);
+    terrainShader.setUniform("light.linear", 0.5f);
+    terrainShader.setUniform("light.quadratic", 0.0019f);
 
     while (!glfwWindowShouldClose(window->getWindow()))
     {
@@ -121,59 +141,22 @@ int App::run()
         // Clearing the window
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            
+
+        // Process events
+        camera.onKeyboardEvent(window->getWindow(), deltaTime);
+
+        // Draw scene
+        simpleLight.render(camera);
+
+        terrain.render(camera, terrainShader);
+        coin.render(camera, materialShader);
+        gate.render(camera, materialShader);
+
         // New GUI frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        // process events
-        camera.onKeyboardEvent(window->getWindow(), deltaTime);
-
-        // Draw scene
-        
-        // Moving light
-
-        // Gate
-        gateShader.activate();
-        gateShader.setUniform("light.position", simpleLight.position);
-        gateShader.setUniform("light.ambient", simpleLight.ambient);
-        gateShader.setUniform("light.diffuse", simpleLight.diffusion);
-        gateShader.setUniform("light.specular", simpleLight.specular);
-        gateShader.setUniform("light.constant", 1.0f);
-        gateShader.setUniform("light.linear", 0.09f);
-        gateShader.setUniform("light.quadratic", 0.032f);
-
-        auto model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 10.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(0.5f));
-        model = glm::rotate(model, (float)glfwGetTime() / 4, glm::vec3(0.0f, 1.0f, 0.0f));
-
-        gateShader.setUniform("transform", model);
-        gateShader.setUniform("view", camera.getViewMatrix());
-        gateShader.setUniform("projection", camera.getProjectionMatrix());
-
-        // Terrain
-        terrainShader.activate();
-        terrainShader.setUniform("light.position", simpleLight.position);
-        terrainShader.setUniform("light.ambient", simpleLight.ambient);
-        terrainShader.setUniform("light.diffuse", simpleLight.diffusion);
-        terrainShader.setUniform("light.specular", simpleLight.specular);
-        terrainShader.setUniform("light.constant", 1.0f);
-        terrainShader.setUniform("light.linear", 0.5f);
-        terrainShader.setUniform("light.quadratic", 0.0019f);
-
-        terrainShader.setUniform("transform", glm::mat4(1.0f));
-        terrainShader.setUniform("view", camera.getViewMatrix());
-        terrainShader.setUniform("projection", camera.getProjectionMatrix());
-
-        simpleLight.render(camera);
-
-        terrain.render(terrainShader);
-        coin.render(gateShader);
-        gate.render(gateShader);
-
-        // Draw HUD
         ImGui::SetNextWindowSize(ImVec2(200, ImGui::GetTextLineHeightWithSpacing() * 3));
         ImGui::SetNextWindowPos(ImVec2(10, 10));
         ImGui::Begin("FPS Counter", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings);

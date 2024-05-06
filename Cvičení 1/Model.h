@@ -7,18 +7,17 @@
 #include <GLFW/glfw3.h>
 #include "glm/glm.hpp"
 
-#include "Mesh.h";
+#include "Camera.h"
+#include "Mesh.h"
 
 class Model
 {
 public:
-	glm::vec3 position;
-	glm::vec3 rotation;
-	glm::vec3 scale;
-
+	glm::mat4 transform;
 	std::vector<Mesh> meshes;
+
 	Model(const std::filesystem::path& filename);
 
-	void render(Shader& shader);
+	void render(Camera& camera, Shader& shader);
 };
 
