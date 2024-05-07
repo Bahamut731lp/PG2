@@ -3,16 +3,27 @@
 #include <numeric>
 #include "Logger.h"
 #include "Vertex.h"
+#include "Material.h"
 #include "Mesh.h"
 #include "OBJLoader.h"
 #include "StringUtils.h"
 
+struct MeshContainer {
+	std::vector< unsigned int > vertices;
+	std::vector< unsigned int > uvs;
+	std::vector< unsigned int > normals;
+	Material material;
+};
+
 OBJLoader::OBJLoader(const std::filesystem::path& modelFilename)
 {
-	std::vector< unsigned int > vertexIndices, uvIndices, normalIndices;
 	std::vector<glm::vec3> temp_vertices;
 	std::vector<glm::vec2> temp_uvs;
 	std::vector<glm::vec3> temp_normals;
+
+	std::vector<MeshContainer> parts;
+	auto basic = MeshContainer();
+	parts.push_back(basic);
 
 	Logger::info("Loading " + modelFilename.string());
 
@@ -46,97 +57,85 @@ OBJLoader::OBJLoader(const std::filesystem::path& modelFilename)
 		// Normals definition
 		else if (header == "vn") OBJLoader::Parse::normal(tokens, temp_normals);
 		// Faces
-		else if (header == "f") OBJLoader::Parse::face(tokens, vertexIndices, uvIndices, normalIndices);
+		else if (header == "f") OBJLoader::Parse::face(tokens, parts.back().vertices, parts.back().uvs, parts.back().normals);
 		//TODO
 		else if (header == "usemtl") {
 			// Here we cope that the material exists
 			// TODO: Handle errors here
-			usedMaterial = materials[tokens[0]];
+			auto material = materials[tokens[0]];
+			auto test = MeshContainer();
+			test.material = material;
+
+			Logger::debug("Creating Material Submesh: " + tokens[0]);
+
+			parts.push_back(test);
 		}
 	}
 
-	std::ostringstream statistics, indicies, mat;
+	std::ostringstream statistics, mat;
 
 	Logger::info("Parsed model " + modelFilename.string());
+	Logger::info("Model Parts: " + std::to_string(parts.size()));
 
 	statistics << "Vertices: " << temp_vertices.size() << ", ";
 	statistics << "UVs: " << temp_uvs.size() << ", ";
 	statistics << "Normals: " << temp_normals.size();
-
-	indicies << "Vertices: " << vertexIndices.size() << ", ";
-	indicies << "UVs: " << uvIndices.size() << ", ";
-	indicies << "Normals: " << normalIndices.size();
 
 	for (auto i = materials.begin(); i != materials.end(); ++i) {
 		mat << i->first << " ";
 	}
 
 	Logger::debug("Model Primitives: \t" + statistics.str());
-	Logger::debug("Model Indicies: \t" + indicies.str());
 	Logger::debug("Model Materials: \t" + mat.str());
 
-	// unroll from indirect to direct vertex specification
-	// sometimes not necessary, definitely not optimal
-	for (unsigned int u = 0; u < vertexIndices.size(); u++) {
-		unsigned int vertexIndex = vertexIndices[u];
-		glm::vec3 vertex = temp_vertices[vertexIndex - 1];
-		vertices.push_back(vertex);
-	}
+	for (MeshContainer mesh : parts) {
+		if (mesh.vertices.empty()) continue;
 
-	if (!temp_uvs.empty()) {
-		for (unsigned int u = 0; u < uvIndices.size(); u++) {
-			unsigned int uvIndex = uvIndices[u];
-			glm::vec2 uv = temp_uvs[uvIndex - 1];
-			uvs.push_back(uv);
+		//Hey, i know it's spelled wrong.
+		//But I've vertices already defined.
+		std::vector<Vertex> vertexes;
+		std::vector< GLuint > indices;
+
+		// unroll from indirect to direct vertex specification
+		// sometimes not necessary, definitely not optimal
+		for (unsigned int u = 0; u < mesh.vertices.size(); u++) {
+			Vertex vertex;
+			unsigned int vertexIndex = mesh.vertices[u];
+			unsigned int uvIndex = mesh.uvs[u];
+			unsigned int normalIndex = mesh.normals[u];
+
+			// Getting vertices
+			if (vertexIndex - 1 < temp_vertices.size()) {
+				glm::vec3 position = temp_vertices[vertexIndex - 1];
+				vertex.Position = position;
+			}
+
+			// Getting UV information
+			if (uvIndex - 1 < temp_uvs.size()) {
+				glm::vec2 uv = temp_uvs[uvIndex - 1];
+				vertex.UVs = uv;
+			}
+			else {
+				vertex.UVs = glm::vec2{ 0.5, 0.5 };
+			}
+
+			// Getting Normals
+			if (normalIndex - 1 < temp_normals.size()) {
+				glm::vec3 normal = temp_normals[normalIndex - 1];
+				vertex.Normal = normal;
+			}
+			else {
+				vertex.Normal = glm::vec3{ 0, 0, 0 };
+			}
+
+			vertexes.push_back(vertex);
+			indices.push_back(u);
 		}
+
+		auto instance = Mesh(GL_TRIANGLES, vertexes, indices, 0);
+		instance.material = mesh.material;
+		submeshes.push_back(instance);
 	}
-
-	if (!temp_normals.empty()) {
-		for (unsigned int u = 0; u < normalIndices.size(); u++) {
-			unsigned int normalIndex = normalIndices[u];
-			glm::vec3 normal = temp_normals[normalIndex - 1];
-			normals.push_back(normal);
-		}
-	}
-
-	// Iterate through the vertices and assign indices sequentially
-	for (unsigned int i = 0; i < vertices.size(); ++i) {
-		indices.push_back(i);
-	}
-}
-
-/**
- * @brief Retrieves the mesh data parsed by the OBJLoader.
- *
- * This function returns the mesh data parsed by the OBJLoader as a Mesh object.
- * The Mesh object contains information about vertices, texture coordinates, normals, and faces that make up the mesh.
- *
- * @return A Mesh object containing the parsed mesh data.
- */
-Mesh OBJLoader::getMesh()
-{
-	//Hey, i know it's spelled wrong.
-	//But I've vertices already defined.
-	std::vector<Vertex> vertexes;
-
-	for (unsigned int i = 0; i < vertices.size(); i++) {
-		Vertex vertex;
-		vertex.Position = vertices[i];
-		vertex.UVs = i < uvs.size() ? uvs[i] : glm::vec2{ 0.5, 0.5 };
-		vertex.Normal = i < normals.size() ? normals[i] : glm::vec3{ 0, 0, 0 };
-
-		vertexes.push_back(vertex);
-	}
-
-	auto instance = Mesh(GL_TRIANGLES, vertexes, indices, 0);
-
-	// Hardcoded test
-	instance.ambient = usedMaterial.ambient;
-	instance.diffuse = usedMaterial.diffuse;
-	instance.specular = usedMaterial.specular;
-	instance.shininess = usedMaterial.shininess;
-
-	return instance;
 }
 
 /**

@@ -10,7 +10,13 @@ bool Window::isMouseMoved = false;
 Camera* Window::cam = nullptr;
 
 Window::Window(int width, int height, const char* title, bool fullscreen, bool vsync)
-    : fullscreen(fullscreen), vsync(vsync) {
+    : fullscreen(fullscreen), vsync(vsync)
+{
+    lastWindowX = 0;
+    lastWindowY = 0;
+    lastWindowWidth = width;
+    lastWindowHeight = height;
+
 
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW\n";
@@ -38,6 +44,8 @@ Window::Window(int width, int height, const char* title, bool fullscreen, bool v
 
     glfwSetKeyCallback(window, key_callback);
     glfwSetScrollCallback(window, scroll_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
+
     this->setVsync(vsync);
 }
 
@@ -55,11 +63,14 @@ void Window::setFullscreen(bool fullscreen) {
     if (fullscreen) {
         GLFWmonitor* monitor = glfwGetPrimaryMonitor();
         const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
+        glfwGetWindowPos(window, &lastWindowX, &lastWindowY);
+        glfwGetWindowSize(window, &lastWindowWidth, &lastWindowHeight);
         glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, GLFW_DONT_CARE);
     }
     else {
         const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        glfwSetWindowMonitor(window, nullptr, 150, 150, mode->width / 2, mode->height / 2, GLFW_DONT_CARE);
+        glfwSetWindowMonitor(window, nullptr, lastWindowX, lastWindowY, lastWindowWidth, lastWindowHeight, GLFW_DONT_CARE);
     }
 }
 
@@ -87,6 +98,7 @@ bool Window::isFullscreen() const {
 
 // Static key callback function
 void Window::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+
     // glfwGetWindowUserPointer() vytáhne z okna custom pointer, který je k nìmu pøiøazen
     // v našem pøípadì jsem k tomu pøidadil instanci tøídy Window v jejím konstruktoru
     // static_cast<Window*> je type_casting syntax (pøevod datového typu) - tím my c++ øekneme, že ten pointer je na tøídu Window
@@ -94,6 +106,7 @@ void Window::key_callback(GLFWwindow* window, int key, int scancode, int action,
     if (instance) {
         instance->onKeyEvent(key, action);
     }
+
 }
 
 /*
@@ -127,6 +140,13 @@ void Window::handle_key_press(int key, int action) {
             Logger::info("VSync " + std::string(vsync ? "enabled" : "disabled"));
             break;
         }
+    }
+}
+
+void Window::mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        Logger::info("Mouse Click Event Fired.");
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     }
 }
 

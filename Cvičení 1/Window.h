@@ -18,6 +18,7 @@ public:
     
     // OpenGL callbacks
     static void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
+    static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
     static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
     static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
@@ -25,6 +26,14 @@ public:
     bool isFullscreen() const;
     GLFWwindow* getWindow() const;
 
+    // Window position & size restoration
+    int lastWindowX;
+    int lastWindowY;
+    int lastWindowWidth;
+    int lastWindowHeight;
+
+
+    // Variables for camera movement
     static Camera* cam;
     static bool isMouseMoved;
     static float lastX;

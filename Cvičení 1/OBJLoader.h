@@ -1,25 +1,22 @@
 #pragma once
 #include <unordered_map>
-#include "Loader.h"
 #include "Mesh.h"
-
-struct Material {
-    std::string name;
-    glm::vec3 ambient;
-    glm::vec3 diffuse;
-    glm::vec3 specular;
-    float shininess;
-};
+#include "Material.h"
 
 /*
 	Loader pro formát modelù .obj
     Currently uses only last mentioned material, that is TODO
 */
-class OBJLoader : public Loader
+class OBJLoader
 {
 public:
     OBJLoader(const std::filesystem::path& filename);
-	Mesh getMesh();
+
+    std::vector< glm::vec3 > vertices;
+    std::vector< glm::vec2 > uvs;
+    std::vector< glm::vec3 > normals;
+
+    std::vector<Mesh> submeshes;
 
     class Parse {
     public:
@@ -38,6 +35,5 @@ public:
 
 private:
     std::unordered_map<std::string, Material> materials;
-    Material usedMaterial;
 };
 

@@ -161,8 +161,11 @@
     <ClInclude Include="OBJLoader.h">
       <Filter>Hlavičkové soubory\Loaders</Filter>
     </ClInclude>
-    <ClInclude Include="Loader.h">
-      <Filter>Hlavičkové soubory\Loaders</Filter>
+    <ClInclude Include="Model.h">
+      <Filter>Hlavičkové soubory</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Hlavičkové soubory</Filter>
     </ClInclude>
     <ClInclude Include="Model.h">
       <Filter>Hlavičkové soubory</Filter>

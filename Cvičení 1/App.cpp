@@ -20,6 +20,8 @@
 #include "Shader.h"
 #include "LightSystem.h"
 
+#include "Model.h"
+
 #include "SimpleLight.h"
 
 #include "FrameCounter.h"
@@ -82,13 +84,16 @@ int App::run()
 
     Logger::debug("OpenGL Debug Output: " + (debug.isAvailable ? std::string("yes") : std::string("no")));
 
+    auto materialShader = Shader(std::filesystem::path("./assets/shaders/material.vert"), std::filesystem::path("./assets/shaders/material.frag"));
+    auto meshShader = Shader(std::filesystem::path("./assets/shaders/material.vert"), std::filesystem::path("./assets/shaders/material.frag"));
+    auto terrainShader = Shader(std::filesystem::path("./assets/shaders/material.vert"), std::filesystem::path("./assets/shaders/material.frag"));
+    
+    
     auto camera = Camera{ glm::vec3(0.0f, 15.0f, 0.0f) };
 
-    auto mesh = OBJLoader("./assets/obj/coin.obj").getMesh();
-    auto meshShader = Shader(std::filesystem::path("./assets/shaders/material.vert"), std::filesystem::path("./assets/shaders/material.frag"));
-
-    auto terrain = OBJLoader("./assets/obj/level_1.obj").getMesh();
-    auto terrainShader = Shader(std::filesystem::path("./assets/shaders/material.vert"), std::filesystem::path("./assets/shaders/material.frag"));
+    auto gate = Model("./assets/obj/gate.obj");
+    auto coin = Model("./assets/obj/coin.obj");
+    auto terrain = Model("./assets/obj/level_1.obj");
 
     LightSystem lightSystem;
     auto simpleLight = SimpleLight(glm::vec3(1.0f, 25.0f, 0.0f), 1.0f);
@@ -101,6 +106,28 @@ int App::run()
 
     glfwSetCursorPosCallback(window->getWindow(), Window::mouse_callback);
     glfwSetInputMode(window->getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    gate.transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 10.0f, 0.0f));
+    gate.transform = glm::scale(gate.transform, glm::vec3(0.5f));
+
+    // The light is not moving, so we do not have to update position in shader every frame
+    materialShader.activate();
+    materialShader.setUniform("light.position", simpleLight.position);
+    materialShader.setUniform("light.ambient", simpleLight.ambient);
+    materialShader.setUniform("light.diffuse", simpleLight.diffusion);
+    materialShader.setUniform("light.specular", simpleLight.specular);
+    materialShader.setUniform("light.constant", 1.0f);
+    materialShader.setUniform("light.linear", 0.09f);
+    materialShader.setUniform("light.quadratic", 0.032f);
+
+    terrainShader.activate();
+    terrainShader.setUniform("light.position", simpleLight.position);
+    terrainShader.setUniform("light.ambient", simpleLight.ambient);
+    terrainShader.setUniform("light.diffuse", simpleLight.diffusion);
+    terrainShader.setUniform("light.specular", simpleLight.specular);
+    terrainShader.setUniform("light.constant", 1.0f);
+    terrainShader.setUniform("light.linear", 0.5f);
+    terrainShader.setUniform("light.quadratic", 0.0019f);
 
     while (!glfwWindowShouldClose(window->getWindow()))
     {
@@ -117,63 +144,23 @@ int App::run()
         // Clearing the window
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            
+
+        // Process events
+        camera.onKeyboardEvent(window->getWindow(), deltaTime);
+
+        // Draw scene
+        lightSystem.calc(meshShader, terrainShader);
+        simpleLight.render(camera);
+
+        terrain.render(camera, terrainShader);
+        coin.render(camera, materialShader);
+        gate.render(camera, materialShader);
+
         // New GUI frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        // process events
-        camera.onKeyboardEvent(window->getWindow(), deltaTime);
-
-        // Draw scene
-        
-        lightSystem.calc(meshShader, terrainShader);
-        // Moving light
-        /*
-        meshShader.activate();
-        meshShader.setUniform("light.position", simpleLight.position);
-        meshShader.setUniform("light.ambient", simpleLight.ambient);
-        meshShader.setUniform("light.diffuse", simpleLight.diffusion);
-        meshShader.setUniform("light.specular", simpleLight.specular);
-        */
-
-        meshShader.setUniform("material.ambient", mesh.ambient);
-        meshShader.setUniform("material.diffuse", mesh.diffuse);
-        meshShader.setUniform("material.specular", mesh.specular); // specular lighting doesn't have full effect on this object's material
-        meshShader.setUniform("material.shininess", mesh.shininess);
-
-        auto model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 10.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(0.5f));
-        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
-
-        meshShader.setUniform("transform", model);
-        meshShader.setUniform("view", camera.getViewMatrix());
-        meshShader.setUniform("projection", camera.getProjectionMatrix());
-
-        /*
-        terrainShader.activate();
-        terrainShader.setUniform("light.position", simpleLight.position);
-        terrainShader.setUniform("light.ambient", simpleLight.ambient);
-        terrainShader.setUniform("light.diffuse", simpleLight.diffusion);
-        terrainShader.setUniform("light.specular", simpleLight.specular);
-        */
-
-        terrainShader.setUniform("material.ambient", terrain.ambient);
-        terrainShader.setUniform("material.diffuse", terrain.diffuse);
-        terrainShader.setUniform("material.specular", terrain.specular);
-        terrainShader.setUniform("material.shininess", terrain.shininess);
-
-        terrainShader.setUniform("transform", glm::mat4(1.0f));
-        terrainShader.setUniform("view", camera.getViewMatrix());
-        terrainShader.setUniform("projection", camera.getProjectionMatrix());
-
-        terrain.draw(terrainShader);
-        mesh.draw(meshShader);
-        simpleLight.render(camera);
-
-        // Draw HUD
         ImGui::SetNextWindowSize(ImVec2(200, ImGui::GetTextLineHeightWithSpacing() * 3));
         ImGui::SetNextWindowPos(ImVec2(10, 10));
         ImGui::Begin("FPS Counter", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings);
