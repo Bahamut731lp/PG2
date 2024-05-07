@@ -94,7 +94,7 @@ int App::run()
     auto coin = Model("./assets/obj/coin.obj");
     auto terrain = Model("./assets/obj/level_1.obj");
 
-    auto simpleLight = SimpleLight(glm::vec3(1.0f, 10.0f, -10.0f), 5.0f);
+    auto simpleLight = SimpleLight(glm::vec3(1.0f, 15.0f, -5.0f), 5.0f);
 
     Window::cam = &camera;
 

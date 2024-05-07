@@ -17,7 +17,7 @@ class SimpleLight
 public:
 	glm::vec3 position;
 	glm::vec3 ambient{ 0.2f };
-	glm::vec3 diffusion{ 20.0f };
+	glm::vec3 diffusion{ 5.0f };
 	glm::vec3 specular{ 1.0f };
 	float intensity;
 
