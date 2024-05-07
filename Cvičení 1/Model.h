@@ -17,6 +17,7 @@ public:
 	std::vector<Mesh> meshes;
 
 	Model(const std::filesystem::path& filename);
+	Model(const Model& copy);
 
 	void render(Camera& camera, Shader& shader);
 };

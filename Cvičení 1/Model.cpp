@@ -30,6 +30,12 @@ Model::Model(const std::filesystem::path& filename)
 	};
 }
 
+Model::Model(const Model& copy)
+{
+	this->meshes = copy.meshes;
+	this->transform = glm::mat4(1.0f);
+}
+
 void Model::render(Camera& camera, Shader& shader)
 {
 	shader.activate();

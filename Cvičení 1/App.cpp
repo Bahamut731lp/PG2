@@ -80,32 +80,37 @@ int App::run()
 {
     FrameCounter fps;
     DebugOutputManager debug;
+    float deltaTime = 0.0f;	// Time between current frame and last frame
+    float lastFrame = 0.0f; // Time of last frame
 
     Logger::debug("OpenGL Debug Output: " + (debug.isAvailable ? std::string("yes") : std::string("no")));
 
+    // Create camera
+    auto camera = Camera{ glm::vec3(0.0f, 15.0f, 0.0f) };
+    Window::cam = &camera;
+
+    // Load all shaders
     auto materialShader = Shader(std::filesystem::path("./assets/shaders/material.vert"), std::filesystem::path("./assets/shaders/material.frag"));
     auto meshShader = Shader(std::filesystem::path("./assets/shaders/material.vert"), std::filesystem::path("./assets/shaders/material.frag"));
     auto terrainShader = Shader(std::filesystem::path("./assets/shaders/material.vert"), std::filesystem::path("./assets/shaders/material.frag"));
-    
-    
-    auto camera = Camera{ glm::vec3(0.0f, 15.0f, 0.0f) };
 
+    // Load all models needed for scene
     auto gate = Model("./assets/obj/gate.obj");
     auto coin = Model("./assets/obj/coin.obj");
     auto terrain = Model("./assets/obj/level_1.obj");
 
+    // Create another instances if needed without having to read files over again
+    auto gate2 = Model(gate);
+
+    // Define lights
     auto simpleLight = SimpleLight(glm::vec3(1.0f, 15.0f, -5.0f), 5.0f);
 
-    Window::cam = &camera;
-
-    float deltaTime = 0.0f;	// Time between current frame and last frame
-    float lastFrame = 0.0f; // Time of last frame
-
-    glfwSetCursorPosCallback(window->getWindow(), Window::mouse_callback);
-    glfwSetInputMode(window->getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
+    // Define transforms for all objects
     gate.transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 10.0f, 0.0f));
     gate.transform = glm::scale(gate.transform, glm::vec3(0.5f));
+
+    gate2.transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 10.0f, 0.0f));
+    gate2.transform = glm::scale(gate2.transform, glm::vec3(0.8f));
 
     // The light is not moving, so we do not have to update position in shader every frame
     materialShader.activate();
@@ -125,6 +130,10 @@ int App::run()
     terrainShader.setUniform("light.constant", 1.0f);
     terrainShader.setUniform("light.linear", 0.5f);
     terrainShader.setUniform("light.quadratic", 0.0019f);
+
+    // Attach callbacks
+    glfwSetCursorPosCallback(window->getWindow(), Window::mouse_callback);
+    glfwSetInputMode(window->getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     while (!glfwWindowShouldClose(window->getWindow()))
     {
@@ -148,9 +157,11 @@ int App::run()
         // Draw scene
         simpleLight.render(camera);
 
+        // Render all models
         terrain.render(camera, terrainShader);
         coin.render(camera, materialShader);
         gate.render(camera, materialShader);
+        gate2.render(camera, materialShader);
 
         // New GUI frame
         ImGui_ImplOpenGL3_NewFrame();
