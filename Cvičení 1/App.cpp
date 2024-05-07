@@ -18,6 +18,7 @@
 #include "OBJLoader.h"
 #include "Mesh.h"
 #include "Shader.h"
+#include "LightSystem.h"
 
 #include "Model.h"
 
@@ -99,11 +100,13 @@ int App::run()
     auto coin = Model("./assets/obj/coin.obj");
     auto terrain = Model("./assets/obj/level_1.obj");
 
+    LightSystem lightSystem;
     // Create another instances if needed without having to read files over again
     auto gate2 = Model(gate);
 
     // Define lights
-    auto simpleLight = SimpleLight(glm::vec3(1.0f, 15.0f, -5.0f), 5.0f);
+    auto simpleLight = SimpleLight(glm::vec3(1.0f, 25.0f, 0.0f), 1.0f);
+    lightSystem.add(simpleLight);
 
     // Define transforms for all objects
     gate.transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 10.0f, 0.0f));
@@ -142,7 +145,7 @@ int App::run()
         if (fps.hasSecondPassed()) {
             fps.setNumberOfFrames(0);
         }
-
+        
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
@@ -155,6 +158,7 @@ int App::run()
         camera.onKeyboardEvent(window->getWindow(), deltaTime);
 
         // Draw scene
+        lightSystem.calc(meshShader, terrainShader);
         simpleLight.render(camera);
 
         // Render all models
