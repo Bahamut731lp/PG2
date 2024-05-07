@@ -18,6 +18,7 @@
 #include "OBJLoader.h"
 #include "Mesh.h"
 #include "Shader.h"
+#include "LightSystem.h"
 
 #include "Model.h"
 
@@ -94,7 +95,9 @@ int App::run()
     auto coin = Model("./assets/obj/coin.obj");
     auto terrain = Model("./assets/obj/level_1.obj");
 
-    auto simpleLight = SimpleLight(glm::vec3(1.0f, 15.0f, -5.0f), 5.0f);
+    LightSystem lightSystem;
+    auto simpleLight = SimpleLight(glm::vec3(1.0f, 25.0f, 0.0f), 1.0f);
+    lightSystem.add(simpleLight);
 
     Window::cam = &camera;
 
@@ -133,7 +136,7 @@ int App::run()
         if (fps.hasSecondPassed()) {
             fps.setNumberOfFrames(0);
         }
-
+        
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
@@ -146,6 +149,7 @@ int App::run()
         camera.onKeyboardEvent(window->getWindow(), deltaTime);
 
         // Draw scene
+        lightSystem.calc(meshShader, terrainShader);
         simpleLight.render(camera);
 
         terrain.render(camera, terrainShader);
