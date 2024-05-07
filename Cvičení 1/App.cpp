@@ -18,6 +18,7 @@
 #include "OBJLoader.h"
 #include "Mesh.h"
 #include "Shader.h"
+#include "LightSystem.h"
 
 #include "SimpleLight.h"
 
@@ -89,7 +90,9 @@ int App::run()
     auto terrain = OBJLoader("./assets/obj/level_1.obj").getMesh();
     auto terrainShader = Shader(std::filesystem::path("./assets/shaders/material.vert"), std::filesystem::path("./assets/shaders/material.frag"));
 
+    LightSystem lightSystem;
     auto simpleLight = SimpleLight(glm::vec3(1.0f, 25.0f, 0.0f), 1.0f);
+    lightSystem.add(simpleLight);
 
     Window::cam = &camera;
 
@@ -106,7 +109,7 @@ int App::run()
         if (fps.hasSecondPassed()) {
             fps.setNumberOfFrames(0);
         }
-
+        
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
@@ -125,12 +128,15 @@ int App::run()
 
         // Draw scene
         
+        lightSystem.calc(meshShader, terrainShader);
         // Moving light
+        /*
         meshShader.activate();
         meshShader.setUniform("light.position", simpleLight.position);
         meshShader.setUniform("light.ambient", simpleLight.ambient);
         meshShader.setUniform("light.diffuse", simpleLight.diffusion);
         meshShader.setUniform("light.specular", simpleLight.specular);
+        */
 
         meshShader.setUniform("material.ambient", mesh.ambient);
         meshShader.setUniform("material.diffuse", mesh.diffuse);
@@ -146,11 +152,13 @@ int App::run()
         meshShader.setUniform("view", camera.getViewMatrix());
         meshShader.setUniform("projection", camera.getProjectionMatrix());
 
+        /*
         terrainShader.activate();
         terrainShader.setUniform("light.position", simpleLight.position);
         terrainShader.setUniform("light.ambient", simpleLight.ambient);
         terrainShader.setUniform("light.diffuse", simpleLight.diffusion);
         terrainShader.setUniform("light.specular", simpleLight.specular);
+        */
 
         terrainShader.setUniform("material.ambient", terrain.ambient);
         terrainShader.setUniform("material.diffuse", terrain.diffuse);
