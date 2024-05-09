@@ -37,6 +37,7 @@ public:
 private:
 	std::string getShaderInfoLog(const GLuint obj); 
 	std::string getProgramInfoLog(const GLuint obj);
+	std::string shaderName;
 
 	GLuint compile_shader(const std::filesystem::path& source_file, const GLenum type);
 	GLuint link_shader(const std::vector<GLuint> shader_ids);

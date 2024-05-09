@@ -5,6 +5,7 @@
 #include <sstream>
 #include <filesystem>
 
+#include "Logger.h"
 #include "Shader.h"
 
 Shader::Shader(const std::filesystem::path& VS_file, const std::filesystem::path& FS_file)
@@ -15,13 +16,14 @@ Shader::Shader(const std::filesystem::path& VS_file, const std::filesystem::path
 	shader_ids.push_back(compile_shader(FS_file, GL_FRAGMENT_SHADER));
 
 	ID = link_shader(shader_ids);
+	shaderName = FS_file.filename().string();
 }
 
 void Shader::setUniform(const std::string& name, const float val)
 {
 	auto loc = glGetUniformLocation(ID, name.c_str());
 	if (loc == -1) {
-		std::cerr << "no uniform with name:" << name << '\n';
+		Logger::warning(shaderName + ": Uniform (float) " + name + " does not exists.");
 		return;
 	}
 
@@ -32,7 +34,7 @@ void Shader::setUniform(const std::string& name, const int val)
 {
 	auto loc = glGetUniformLocation(ID, name.c_str());
 	if (loc == -1) {
-		std::cerr << "no uniform with name:" << name << '\n';
+		Logger::warning(shaderName + ": Uniform (int) " + name + " does not exists.");
 		return;
 	}
 	glUniform1i(loc, val);
@@ -42,7 +44,7 @@ void Shader::setUniform(const std::string& name, const glm::vec3 val)
 {
 	auto loc = glGetUniformLocation(ID, name.c_str());
 	if (loc == -1) {
-		std::cerr << "no uniform with name:" << name << '\n';
+		Logger::warning(shaderName + ": Uniform (vec3) " + name + " does not exists.");
 		return;
 	}
 	glUniform3fv(loc, 1, glm::value_ptr(val));
@@ -52,7 +54,7 @@ void Shader::setUniform(const std::string& name, const glm::vec4 val)
 {
 	auto loc = glGetUniformLocation(ID, name.c_str());
 	if (loc == -1) {
-		std::cerr << "no uniform with name:" << name << '\n';
+		Logger::warning(shaderName + ": Uniform (vec4) " + name + " does not exists.");
 		return;
 	}
 	glUniform4fv(loc, 1, glm::value_ptr(val));
@@ -62,7 +64,7 @@ void Shader::setUniform(const std::string& name, const glm::mat3 val)
 {
 	auto loc = glGetUniformLocation(ID, name.c_str());
 	if (loc == -1) {
-		std::cout << "no uniform with name:" << name << '\n';
+		Logger::warning(shaderName + ": Uniform (mat3) " + name + " does not exists.");
 		return;
 	}
 
@@ -73,7 +75,7 @@ void Shader::setUniform(const std::string& name, const glm::mat4 val)
 {
 	auto loc = glGetUniformLocation(ID, name.c_str());
 	if (loc == -1) {
-		std::cout << "no uniform with name:" << name << '\n';
+		Logger::warning(shaderName + ": Uniform (mat4) " + name + " does not exists.");
 		return;
 	}
 
