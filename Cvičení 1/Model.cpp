@@ -46,7 +46,7 @@ void Model::render(Camera& camera, Shader& shader)
 
 	for (Mesh mesh : meshes)
 	{
-		shader.setUniform("material.ambient", mesh.material.ambient);
+		//shader.setUniform("material.ambient", mesh.material.ambient);
 		shader.setUniform("material.diffuse", mesh.material.diffuse);
 		shader.setUniform("material.specular", mesh.material.specular);
 		shader.setUniform("material.shininess", mesh.material.shininess);
