@@ -22,7 +22,7 @@
 
 #include "Model.h"
 
-#include "SimpleLight.h"
+#include "PointLight.h"
 
 #include "FrameCounter.h"
 #include "DebugOutputManager.h"
@@ -103,12 +103,13 @@ int App::run()
     auto gate2 = Model(gate);
 
     // Define lights
-    auto simpleLight = SimpleLight(glm::vec3(1.0f, 15.0f, -5.0f), 1.0f);
+    PointLight simpleLight = {
+        glm::vec3(1.0f, 15.0f, -5.0f)
+    };
 
     // Define transforms for all objects
     gate.transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 10.0f, 0.0f));
     gate.transform = glm::scale(gate.transform, glm::vec3(0.5f));
-
     gate2.transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 10.0f, 0.0f));
     gate2.transform = glm::scale(gate2.transform, glm::vec3(0.8f));
 
@@ -141,7 +142,7 @@ int App::run()
         camera.onKeyboardEvent(window->getWindow(), deltaTime);
 
         // Draw scene
-        simpleLight.render(camera);
+        //simpleLight.render(camera);
 
         // Render all models
         terrain.render(camera, materialShader);

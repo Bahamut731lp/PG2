@@ -2,9 +2,9 @@
 #include <glm/glm.hpp>
 #include "LightSystem.h"
 #include "Shader.h"
-#include "SimpleLight.h"
+#include "PointLight.h"
 
-void LightSystem::add(const SimpleLight& light)
+void LightSystem::add(const PointLight& light)
 {
     //podle nìjakýho párka na StackOverflow je "emplace_back" lepší než "push_back" ale kdo ví. Krásy 3. stránky po google search
 	lights.push_back(light);
