@@ -11,8 +11,10 @@ public:
     LightSystem() = default;
 
     void add(const SimpleLight& light);
-    void calc(Shader& meshShader, Shader& terrainShader);
+    void add(const Shader& shader);
+    void calc();
 
 private:
     std::vector<SimpleLight> lights;
+    std::vector<Shader> shaders;
 };

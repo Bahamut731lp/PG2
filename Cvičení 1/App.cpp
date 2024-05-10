@@ -92,21 +92,18 @@ int App::run()
 
     // Load all shaders
     auto materialShader = Shader(std::filesystem::path("./assets/shaders/material.vert"), std::filesystem::path("./assets/shaders/material.frag"));
-    auto meshShader = Shader(std::filesystem::path("./assets/shaders/material.vert"), std::filesystem::path("./assets/shaders/material.frag"));
-    auto terrainShader = Shader(std::filesystem::path("./assets/shaders/material.vert"), std::filesystem::path("./assets/shaders/material.frag"));
 
     // Load all models needed for scene
     auto gate = Model("./assets/obj/gate.obj");
     auto coin = Model("./assets/obj/coin.obj");
     auto terrain = Model("./assets/obj/level_1.obj");
 
-    LightSystem lightSystem;
+    LightSystem staticLights;
     // Create another instances if needed without having to read files over again
     auto gate2 = Model(gate);
 
     // Define lights
-    auto simpleLight = SimpleLight(glm::vec3(1.0f, 25.0f, 0.0f), 1.0f);
-    lightSystem.add(simpleLight);
+    auto simpleLight = SimpleLight(glm::vec3(1.0f, 15.0f, -5.0f), 1.0f);
 
     // Define transforms for all objects
     gate.transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 10.0f, 0.0f));
@@ -116,23 +113,9 @@ int App::run()
     gate2.transform = glm::scale(gate2.transform, glm::vec3(0.8f));
 
     // The light is not moving, so we do not have to update position in shader every frame
-    materialShader.activate();
-    materialShader.setUniform("light.position", simpleLight.position);
-    materialShader.setUniform("light.ambient", simpleLight.ambient);
-    materialShader.setUniform("light.diffuse", simpleLight.diffusion);
-    materialShader.setUniform("light.specular", simpleLight.specular);
-    materialShader.setUniform("light.constant", 1.0f);
-    materialShader.setUniform("light.linear", 0.09f);
-    materialShader.setUniform("light.quadratic", 0.032f);
-
-    terrainShader.activate();
-    terrainShader.setUniform("light.position", simpleLight.position);
-    terrainShader.setUniform("light.ambient", simpleLight.ambient);
-    terrainShader.setUniform("light.diffuse", simpleLight.diffusion);
-    terrainShader.setUniform("light.specular", simpleLight.specular);
-    terrainShader.setUniform("light.constant", 1.0f);
-    terrainShader.setUniform("light.linear", 0.5f);
-    terrainShader.setUniform("light.quadratic", 0.0019f);
+    staticLights.add(simpleLight);
+    staticLights.add(materialShader);
+    staticLights.calc();
 
     // Attach callbacks
     glfwSetCursorPosCallback(window->getWindow(), Window::mouse_callback);
@@ -158,11 +141,10 @@ int App::run()
         camera.onKeyboardEvent(window->getWindow(), deltaTime);
 
         // Draw scene
-        lightSystem.calc(meshShader, terrainShader);
         simpleLight.render(camera);
 
         // Render all models
-        terrain.render(camera, terrainShader);
+        terrain.render(camera, materialShader);
         coin.render(camera, materialShader);
         gate.render(camera, materialShader);
         gate2.render(camera, materialShader);

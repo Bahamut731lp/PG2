@@ -10,20 +10,23 @@ void LightSystem::add(const SimpleLight& light)
 	lights.push_back(light);
 }
 
-void LightSystem::calc(Shader& meshShader, Shader& terrainShader)
+void LightSystem::add(const Shader& shader)
 {
-    for (const auto& light : lights) {
-        // Moving light
-        meshShader.activate();
-        meshShader.setUniform("light.position", light.position);
-        meshShader.setUniform("light.ambient", light.ambient);
-        meshShader.setUniform("light.diffuse", light.diffusion);
-        meshShader.setUniform("light.specular", light.specular);
+    shaders.push_back(shader);
+}
 
-        terrainShader.activate();
-        terrainShader.setUniform("light.position", light.position);
-        terrainShader.setUniform("light.ambient", light.ambient);
-        terrainShader.setUniform("light.diffuse", light.diffusion);
-        terrainShader.setUniform("light.specular", light.specular);
+void LightSystem::calc()
+{
+    for (Shader shader : shaders) {
+        for (const auto& light : lights) {
+            shader.activate();
+            shader.setUniform("light.position", light.position);
+            shader.setUniform("light.ambient", light.ambient);
+            shader.setUniform("light.diffuse", light.diffusion);
+            shader.setUniform("light.specular", light.specular);
+            shader.setUniform("light.constant", 1.0f);
+            shader.setUniform("light.linear", 0.09f);
+            shader.setUniform("light.quadratic", 0.032f);
+        }
     }
 }
