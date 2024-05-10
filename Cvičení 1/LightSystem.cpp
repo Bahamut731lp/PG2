@@ -18,15 +18,19 @@ void LightSystem::add(const Shader& shader)
 void LightSystem::calc()
 {
     for (Shader shader : shaders) {
+        int index = 0;
         for (const auto& light : lights) {
             shader.activate();
-            shader.setUniform("light.position", light.position);
-            shader.setUniform("light.ambient", light.ambient);
-            shader.setUniform("light.diffuse", light.diffusion);
-            shader.setUniform("light.specular", light.specular);
-            shader.setUniform("light.constant", 1.0f);
-            shader.setUniform("light.linear", 0.09f);
-            shader.setUniform("light.quadratic", 0.032f);
+            //TODO: Convert this to UBOs
+            shader.setUniform("pointLights[" + std::to_string(index) + "].position", light.position);
+            shader.setUniform("pointLights[" + std::to_string(index) + "].ambient", light.ambient);
+            shader.setUniform("pointLights[" + std::to_string(index) + "].diffuse", light.diffusion);
+            shader.setUniform("pointLights[" + std::to_string(index) + "].specular", light.specular);
+            shader.setUniform("pointLights[" + std::to_string(index) + "].constant", 1.0f);
+            shader.setUniform("pointLights[" + std::to_string(index) + "].linear", 0.09f);
+            shader.setUniform("pointLights[" + std::to_string(index) + "].quadratic", 0.032f);
+
+            index += 1;
         }
     }
 }

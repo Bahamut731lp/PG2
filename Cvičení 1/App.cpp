@@ -87,7 +87,7 @@ int App::run()
     Logger::debug("OpenGL Debug Output: " + (debug.isAvailable ? std::string("yes") : std::string("no")));
 
     // Create camera
-    auto camera = Camera{ glm::vec3(0.0f, 15.0f, 0.0f) };
+    auto camera = Camera{ glm::vec3(-2.50f, 15.0f, 0.0f) };
     Window::cam = &camera;
 
     // Load all shaders
@@ -107,6 +107,14 @@ int App::run()
         glm::vec3(1.0f, 15.0f, -5.0f)
     };
 
+    PointLight simpleLight2 = {
+        glm::vec3(10.0f, 15.0f, 0.0f)
+    };
+
+    PointLight simpleLight3 = {
+        glm::vec3(-10.0f, 15.0f, 0.0f)
+    };
+
     // Define transforms for all objects
     gate.transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 10.0f, 0.0f));
     gate.transform = glm::scale(gate.transform, glm::vec3(0.5f));
@@ -115,7 +123,11 @@ int App::run()
 
     // The light is not moving, so we do not have to update position in shader every frame
     staticLights.add(simpleLight);
+    staticLights.add(simpleLight2);
+    staticLights.add(simpleLight3);
+
     staticLights.add(materialShader);
+
     staticLights.calc();
 
     // Attach callbacks
@@ -143,12 +155,14 @@ int App::run()
 
         // Draw scene
         //simpleLight.render(camera);
+        staticLights.calc();
 
         // Render all models
         terrain.render(camera, materialShader);
         coin.render(camera, materialShader);
         gate.render(camera, materialShader);
         gate2.render(camera, materialShader);
+
 
         // New GUI frame
         ImGui_ImplOpenGL3_NewFrame();
