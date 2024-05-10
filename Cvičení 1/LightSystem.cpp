@@ -4,9 +4,13 @@
 #include "Shader.h"
 #include "PointLight.h"
 
+void LightSystem::add(AmbientLight& light)
+{
+    ambientLights.push_back(&light);
+}
+
 void LightSystem::add(PointLight& light)
 {
-    //podle nìjakıho párka na StackOverflow je "emplace_back" lepší ne "push_back" ale kdo ví. Krásy 3. stránky po google search
     pointLights.push_back(&light);
 }
 
@@ -43,20 +47,6 @@ void LightSystem::calc()
 
             index += 1;
         }
-        /*for (auto it = pointLights.begin(); it != pointLights.end(); ++it) {
-            auto light = it->second;
-
-            shader.activate();
-            shader.setUniform("pointLights[" + std::to_string(index) + "].position", light.position);
-            shader.setUniform("pointLights[" + std::to_string(index) + "].ambient", light.ambient);
-            shader.setUniform("pointLights[" + std::to_string(index) + "].diffuse", light.diffusion);
-            shader.setUniform("pointLights[" + std::to_string(index) + "].specular", light.specular);
-            shader.setUniform("pointLights[" + std::to_string(index) + "].constant", 1.0f);
-            shader.setUniform("pointLights[" + std::to_string(index) + "].linear", 0.09f);
-            shader.setUniform("pointLights[" + std::to_string(index) + "].quadratic", 0.032f);
-
-            index += 1;
-        }*/
 
         index = 0;
         //TODO: Convert this part to UBOs
@@ -84,6 +74,16 @@ void LightSystem::calc()
             shader.setUniform("directionalLights[" + std::to_string(index) + "].ambient", light->ambient);
             shader.setUniform("directionalLights[" + std::to_string(index) + "].diffuse", light->diffusion);
             shader.setUniform("directionalLights[" + std::to_string(index) + "].specular", light->specular);
+
+            index += 1;
+        }
+
+        index = 0;
+        //TODO: Convert this part to UBOs
+        for (const auto& light : ambientLights) {
+            shader.activate();
+            shader.setUniform("ambientLights[" + std::to_string(index) + "].color", light->color);
+            shader.setUniform("ambientLights[" + std::to_string(index) + "].intensity", light->intensity);
 
             index += 1;
         }

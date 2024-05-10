@@ -13,6 +13,11 @@ struct Material {
     float shininess;
 }; 
 
+struct AmbientLight {
+    vec3 color;
+    float intensity;
+};
+
 struct PointLight {
     vec3 position;  
   
@@ -53,9 +58,14 @@ in vec3 Normal;
 uniform vec3 viewPos;
 uniform Material material;
 
+uniform AmbientLight ambientLights[MAX_AMBIENT_LIGHTS];
 uniform PointLight pointLights[MAX_POINTS_LIGHTS];
 uniform SpotLight spotLights[MAX_SPOT_LIGHTS];
 uniform DirectionaLight directionalLights[MAX_DIRECTIONAL_LIGHTS];
+
+vec3 getAmbientLight(AmbientLight light, Material material) {
+    return light.color * light.intensity * material.diffuse;
+}
 
 vec3 getPointLight(PointLight light, Material material, vec3 normal, vec3 fragPos, vec3 viewDir) {
     vec3 lightDir = normalize(light.position - fragPos);
@@ -136,6 +146,13 @@ void main()
     vec3 accumulator = vec3(0.0);
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPos - FragPos);
+
+    for (int i = 0; i < MAX_AMBIENT_LIGHTS; i++) {
+        // if light is not shining anything, skip it.
+        if (ambientLights[i].color == vec3(0.0f)) continue;
+
+        accumulator += getAmbientLight(ambientLights[i], material);
+    }
 
     for (int i = 0; i < MAX_POINTS_LIGHTS; i++) {
         // if light is not shining anything, skip it.

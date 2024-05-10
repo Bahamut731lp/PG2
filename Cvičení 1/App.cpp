@@ -109,8 +109,9 @@ int App::run()
 
     // Define lights
     SpotLight spotLight;
-    DirectionalLight dirLight;
+    AmbientLight ambience;
     PointLight simpleLight2, simpleLight3;
+    DirectionalLight sunlight;
 
     // Define transforms for all objects
     gate.transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 10.0f, 0.0f));
@@ -122,19 +123,23 @@ int App::run()
     coin.transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 10.0f, 0.0f));
     coin.transform = glm::scale(coin.transform, glm::vec3(0.25f));
 
+    ambience.color = glm::vec3(1.0f);
+    ambience.intensity = 0.2f;
+
     spotLight.position = glm::vec3(0.0f, 12.5f, -8.0f);
     spotLight.direction = glm::vec3(0.0f, -0.2f, 1.0f);
 
-    dirLight.direction = glm::vec3(0.0f, -0.5f, 0.8f);
-    dirLight.diffusion = glm::vec3(5.0f);
+    sunlight.direction = glm::vec3(0.0f, -0.5f, 0.8f);
+    sunlight.diffusion = glm::vec3(0.0f);
 
     simpleLight2.position = glm::vec3(10.0f, 15.0f, 0.0f);
     simpleLight3.position = glm::vec3(-10.0f, 15.0f, 0.0f);
 
 
     // The light is not moving, so we do not have to update position in shader every frame
+    staticLights.add(sunlight);
+    staticLights.add(ambience);
     staticLights.add(spotLight);
-    staticLights.add(dirLight);
     staticLights.add(simpleLight2);
     staticLights.add(simpleLight3);
     staticLights.add(materialShader);
@@ -164,8 +169,8 @@ int App::run()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        simpleLight2.position = glm::vec3(glfwGetTime(), 15.0f, 0.0f);
-        dirLight.diffusion = glm::vec3(5 * daytime + 5);
+        // Sunlight movement
+        sunlight.diffusion = glm::vec3(5 * daytime + 5);
 
         // Process events
         camera.onKeyboardEvent(window->getWindow(), deltaTime);
