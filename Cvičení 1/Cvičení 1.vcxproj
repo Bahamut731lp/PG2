@@ -187,6 +187,7 @@
     <ClInclude Include="OBJLoader.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="PointLight.h" />
+    <ClInclude Include="SpotLight.h" />
     <ClInclude Include="StringUtils.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="Window.h" />

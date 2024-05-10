@@ -23,6 +23,7 @@
 #include "Model.h"
 
 #include "PointLight.h"
+#include "SpotLight.h"
 
 #include "FrameCounter.h"
 #include "DebugOutputManager.h"
@@ -103,8 +104,9 @@ int App::run()
     auto gate2 = Model(gate);
 
     // Define lights
-    PointLight simpleLight = {
-        glm::vec3(1.0f, 15.0f, -5.0f)
+    SpotLight spotLight = {
+        glm::vec3(0.0f, 12.5f, -8.0f),
+        glm::vec3(0.0f, -0.2f, 1.0f),
     };
 
     PointLight simpleLight2 = {
@@ -121,8 +123,10 @@ int App::run()
     gate2.transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 10.0f, 0.0f));
     gate2.transform = glm::scale(gate2.transform, glm::vec3(0.8f));
 
+    coin.transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 10.0f, 0.0f));
+
     // The light is not moving, so we do not have to update position in shader every frame
-    staticLights.add(simpleLight);
+    staticLights.add(spotLight);
     staticLights.add(simpleLight2);
     staticLights.add(simpleLight3);
 
