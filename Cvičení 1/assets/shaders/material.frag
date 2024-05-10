@@ -40,6 +40,13 @@ struct SpotLight {
     vec3 specular;       
 };
 
+struct DirectionaLight {
+    vec3 direction;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+};  
+
 in vec3 FragPos;  
 in vec3 Normal;  
   
@@ -48,6 +55,7 @@ uniform Material material;
 
 uniform PointLight pointLights[MAX_POINTS_LIGHTS];
 uniform SpotLight spotLights[MAX_SPOT_LIGHTS];
+uniform DirectionaLight directionalLights[MAX_DIRECTIONAL_LIGHTS];
 
 vec3 getPointLight(PointLight light, Material material, vec3 normal, vec3 fragPos, vec3 viewDir) {
     vec3 lightDir = normalize(light.position - fragPos);
@@ -104,6 +112,24 @@ vec3 getSpotLight(SpotLight light, Material material, vec3 normal, vec3 fragPos,
     return (ambient + diffuse + specular);
 }
 
+vec3 getDirectionaLight(DirectionaLight light, Material material, vec3 normal, vec3 viewDir) {
+    vec3 lightDir = normalize(-light.direction);
+
+    // diffuse shading
+    float diff = max(dot(normal, lightDir), 0.0);
+    
+    // specular shading
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    
+    // combine results
+    vec3 ambient = light.ambient * material.diffuse;
+    vec3 diffuse = light.diffuse * diff * material.diffuse;
+    vec3 specular = light.specular * spec * material.specular;
+    
+    return (ambient + diffuse + specular);
+}
+
 
 void main()
 {
@@ -123,6 +149,13 @@ void main()
         if (spotLights[i].diffuse == vec3(0.0f)) continue;
 
         accumulator += getSpotLight(spotLights[i], material, norm, FragPos, viewDir);
+    }
+
+    for (int i = 0; i < MAX_DIRECTIONAL_LIGHTS; i++) {
+        // if light is not shining anything, skip it.
+        if (directionalLights[i].diffuse == vec3(0.0f)) continue;
+
+        accumulator += getDirectionaLight(directionalLights[i], material, norm, viewDir);
     }
 
     FragColor = vec4(accumulator, 1.0);

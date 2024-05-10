@@ -24,6 +24,7 @@
 
 #include "PointLight.h"
 #include "SpotLight.h"
+#include "DirectionalLight.h"
 
 #include "FrameCounter.h"
 #include "DebugOutputManager.h"
@@ -84,6 +85,9 @@ int App::run()
     DebugOutputManager debug;
     float deltaTime = 0.0f;	// Time between current frame and last frame
     float lastFrame = 0.0f; // Time of last frame
+    float daytime = 0.0f;
+
+    const int ONE_DAY = 84;
 
     Logger::debug("OpenGL Debug Output: " + (debug.isAvailable ? std::string("yes") : std::string("no")));
 
@@ -104,32 +108,35 @@ int App::run()
     auto gate2 = Model(gate);
 
     // Define lights
-    SpotLight spotLight = {
-        glm::vec3(0.0f, 12.5f, -8.0f),
-        glm::vec3(0.0f, -0.2f, 1.0f),
-    };
-
-    PointLight simpleLight2 = {
-        glm::vec3(10.0f, 15.0f, 0.0f)
-    };
-
-    PointLight simpleLight3 = {
-        glm::vec3(-10.0f, 15.0f, 0.0f)
-    };
+    SpotLight spotLight;
+    DirectionalLight dirLight;
+    PointLight simpleLight2, simpleLight3;
 
     // Define transforms for all objects
     gate.transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 10.0f, 0.0f));
     gate.transform = glm::scale(gate.transform, glm::vec3(0.5f));
+
     gate2.transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 10.0f, 0.0f));
     gate2.transform = glm::scale(gate2.transform, glm::vec3(0.8f));
 
     coin.transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 10.0f, 0.0f));
+    coin.transform = glm::scale(coin.transform, glm::vec3(0.25f));
+
+    spotLight.position = glm::vec3(0.0f, 12.5f, -8.0f);
+    spotLight.direction = glm::vec3(0.0f, -0.2f, 1.0f);
+
+    dirLight.direction = glm::vec3(0.0f, -0.5f, 0.8f);
+    dirLight.diffusion = glm::vec3(5.0f);
+
+    simpleLight2.position = glm::vec3(10.0f, 15.0f, 0.0f);
+    simpleLight3.position = glm::vec3(-10.0f, 15.0f, 0.0f);
+
 
     // The light is not moving, so we do not have to update position in shader every frame
     staticLights.add(spotLight);
+    staticLights.add(dirLight);
     staticLights.add(simpleLight2);
     staticLights.add(simpleLight3);
-
     staticLights.add(materialShader);
 
     staticLights.calc();
@@ -149,16 +156,21 @@ int App::run()
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
+        daytime = glm::sin((glm::pi<float>() * glfwGetTime() / ONE_DAY) - glm::half_pi<float>());
+
+        float normDayTime = (float)((int)currentFrame % (int)ONE_DAY) / ONE_DAY;
 
         // Clearing the window
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        simpleLight2.position = glm::vec3(glfwGetTime(), 15.0f, 0.0f);
+        dirLight.diffusion = glm::vec3(5 * daytime + 5);
+
         // Process events
         camera.onKeyboardEvent(window->getWindow(), deltaTime);
 
         // Draw scene
-        //simpleLight.render(camera);
         staticLights.calc();
 
         // Render all models
@@ -167,18 +179,19 @@ int App::run()
         gate.render(camera, materialShader);
         gate2.render(camera, materialShader);
 
-
         // New GUI frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        ImGui::SetNextWindowSize(ImVec2(200, ImGui::GetTextLineHeightWithSpacing() * 3));
+        ImGui::SetNextWindowSize(ImVec2(400, ImGui::GetTextLineHeightWithSpacing() * 7));
         ImGui::SetNextWindowPos(ImVec2(10, 10));
         ImGui::Begin("FPS Counter", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings);
         // Could be realtime if std::round(1 / deltatime);
         ImGui::Text("FPS: %d", fps.getLastNumberOfFrames());
         ImGui::Text("Vsync: %s", window->isVSynced() ? "True" : "False");
+        ImGui::Text("Camera Front: %f %f %f", camera.Front[0], camera.Front[1], camera.Front[2]);
+        ImGui::Text("Time: %f", std::floor(normDayTime * 24));
         ImGui::End();
 
         ImGui::Render();

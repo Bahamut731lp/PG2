@@ -169,6 +169,7 @@
     <ClInclude Include="App.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="DebugOutputManager.h" />
+    <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="FrameCounter.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
