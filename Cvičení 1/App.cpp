@@ -71,10 +71,14 @@ void App::report(void)
     Logger::debug(vendor.str());
     Logger::debug(version.str());
 
+    glEnable(GL_DEPTH_TEST);
+
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
-    glEnable(GL_DEPTH_TEST);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     Logger::debug("Enabled Backface Culling (CCW)");
 }
@@ -102,6 +106,7 @@ int App::run()
     auto gate = Model("./assets/obj/gate.obj");
     auto coin = Model("./assets/obj/coin.obj");
     auto terrain = Model("./assets/obj/level_1.obj");
+    auto glass = Model("./assets/obj/glass.obj");
 
     LightSystem staticLights;
     // Create another instances if needed without having to read files over again
@@ -123,8 +128,10 @@ int App::run()
     coin.transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 10.0f, 0.0f));
     coin.transform = glm::scale(coin.transform, glm::vec3(0.25f));
 
+    glass.transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 10.0f, 0.0f));
+
     ambience.color = glm::vec3(1.0f);
-    ambience.intensity = 0.2f;
+    ambience.intensity = 0.05f;
 
     spotLight.position = glm::vec3(0.0f, 12.5f, -8.0f);
     spotLight.direction = glm::vec3(0.0f, -0.2f, 1.0f);
@@ -183,6 +190,7 @@ int App::run()
         coin.render(camera, materialShader);
         gate.render(camera, materialShader);
         gate2.render(camera, materialShader);
+        glass.render(camera, materialShader);
 
         // New GUI frame
         ImGui_ImplOpenGL3_NewFrame();

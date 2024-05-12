@@ -84,9 +84,6 @@
     <ClCompile Include="Logger.cpp">
       <Filter>Zdrojové soubory</Filter>
     </ClCompile>
-    <ClCompile Include="SimpleLight.cpp">
-      <Filter>Zdrojové soubory\Lights</Filter>
-    </ClCompile>
     <ClCompile Include="OBJLoader.cpp">
       <Filter>Zdrojové soubory\Loaders</Filter>
     </ClCompile>
@@ -155,16 +152,10 @@
     <ClInclude Include="Logger.h">
       <Filter>Hlavičkové soubory</Filter>
     </ClInclude>
-    <ClInclude Include="SimpleLight.h">
-      <Filter>Hlavičkové soubory\Lights</Filter>
-    </ClInclude>
     <ClInclude Include="OBJLoader.h">
       <Filter>Hlavičkové soubory\Loaders</Filter>
     </ClInclude>
     <ClInclude Include="Model.h">
-      <Filter>Hlavičkové soubory</Filter>
-    </ClInclude>
-    <ClInclude Include="Material.h">
       <Filter>Hlavičkové soubory</Filter>
     </ClInclude>
     <ClInclude Include="Model.h">
@@ -172,6 +163,21 @@
     </ClInclude>
     <ClInclude Include="LightSystem.h">
       <Filter>Hlavičkové soubory</Filter>
+    </ClInclude>
+    <ClInclude Include="AmbientLight.h">
+      <Filter>Hlavičkové soubory</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionalLight.h">
+      <Filter>Hlavičkové soubory</Filter>
+    </ClInclude>
+    <ClInclude Include="PointLight.h">
+      <Filter>Hlavičkové soubory</Filter>
+    </ClInclude>
+    <ClInclude Include="SpotLight.h">
+      <Filter>Hlavičkové soubory</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Hlavičkové soubory\Loaders</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

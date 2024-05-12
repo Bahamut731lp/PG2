@@ -11,6 +11,7 @@ struct Material {
     vec3 diffuse;
     vec3 specular;    
     float shininess;
+    float transparency;
 }; 
 
 struct AmbientLight {
@@ -69,13 +70,13 @@ vec3 getAmbientLight(AmbientLight light, Material material) {
 
 vec3 getPointLight(PointLight light, Material material, vec3 normal, vec3 fragPos, vec3 viewDir) {
     vec3 lightDir = normalize(light.position - fragPos);
+    vec3 halfwayDir = normalize(lightDir + viewDir);
     
     // diffuse shading
     float diff = max(dot(normal, lightDir), 0.0);
     
     // specular shading
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), material.shininess);
     
     // attenuation
     float distance = length(light.position - fragPos);
@@ -93,13 +94,13 @@ vec3 getPointLight(PointLight light, Material material, vec3 normal, vec3 fragPo
 
 vec3 getSpotLight(SpotLight light, Material material, vec3 normal, vec3 fragPos, vec3 viewDir) {
     vec3 lightDir = normalize(light.position - fragPos);
+    vec3 halfwayDir = normalize(lightDir + viewDir);
     
     // diffuse shading
     float diff = max(dot(normal, lightDir), 0.0);
     
     // specular shading
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), material.shininess);
     
     // attenuation
     float distance = length(light.position - fragPos);
@@ -124,13 +125,13 @@ vec3 getSpotLight(SpotLight light, Material material, vec3 normal, vec3 fragPos,
 
 vec3 getDirectionaLight(DirectionaLight light, Material material, vec3 normal, vec3 viewDir) {
     vec3 lightDir = normalize(-light.direction);
+    vec3 halfwayDir = normalize(lightDir + viewDir);
 
     // diffuse shading
     float diff = max(dot(normal, lightDir), 0.0);
     
     // specular shading
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), material.shininess);
     
     // combine results
     vec3 ambient = light.ambient * material.diffuse;
@@ -175,5 +176,8 @@ void main()
         accumulator += getDirectionaLight(directionalLights[i], material, norm, viewDir);
     }
 
-    FragColor = vec4(accumulator, 1.0);
+    // Gamma Correction
+    accumulator = pow(accumulator, vec3(1.0/2.2));
+    
+    FragColor = vec4(accumulator, material.transparency);
 } 
