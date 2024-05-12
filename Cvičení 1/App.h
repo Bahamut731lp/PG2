@@ -7,6 +7,7 @@ public:
 
     bool init(void);
     void report(void);
+    void configure(void);
     int run(void);
 
     void addMouseHandler(void);
