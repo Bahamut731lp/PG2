@@ -151,6 +151,7 @@
     <ClCompile Include="FrameCounter.cpp" />
     <ClCompile Include="LightSystem.cpp" />
     <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="OBJLoader.cpp" />
@@ -167,6 +168,7 @@
     <ClInclude Include="FrameCounter.h" />
     <ClInclude Include="LightSystem.h" />
     <ClInclude Include="Logger.h" />
+    <ClInclude Include="MainMenu.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />

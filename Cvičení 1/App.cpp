@@ -32,8 +32,8 @@
 #define NK_KEYSTATE_BASED_INPUT
 #define MAX_VERTEX_BUFFER 512 * 1024
 #define MAX_ELEMENT_BUFFER 128 * 1024
-#include "nuklear.h"
-#include "nuklear_glfw_gl4.h"
+#include "nuklear/nuklear.h"
+#include "nuklear/nuklear_glfw_gl4.h"
 
 // Application 
 #include "Logger.h"
@@ -41,18 +41,20 @@
 #include "Camera.h"
 #include "Window.h"
 #include "OBJLoader.h"
+
 #include "Mesh.h"
 #include "Shader.h"
-#include "LightSystem.h"
-
 #include "Model.h"
 
+#include "LightSystem.h"
 #include "PointLight.h"
 #include "SpotLight.h"
 #include "DirectionalLight.h"
 
 #include "FrameCounter.h"
 #include "DebugOutputManager.h"
+
+#include "MainMenu.h"
 
 App::App()
 {
@@ -205,7 +207,6 @@ int App::run()
         glfwPollEvents();
         nk_glfw3_new_frame();
 
-        /* GUI */
         if (nk_begin(ctx, "Demo", nk_rect(50, 50, 230, 250),
             NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE |
             NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE))
