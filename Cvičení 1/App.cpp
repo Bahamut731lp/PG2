@@ -2,10 +2,6 @@
 #include <string>
 #include <sstream>
 
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
-
 #include <GL/glew.h>
 #include <GL/wglew.h>
 #include <GLFW/glfw3.h>
@@ -47,13 +43,6 @@ bool App::init()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    auto io = ImGui::GetIO();
-    ImGui::StyleColorsDark();
-    ImGui_ImplGlfw_InitForOpenGL(window->getWindow(), true);
-    ImGui_ImplOpenGL3_Init("#version 460");
 
     return true;
 }
@@ -159,6 +148,9 @@ int App::run()
 
     while (!glfwWindowShouldClose(window->getWindow()))
     {
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         //menu.render();
         // If a second has passed.
         if (fps.hasSecondPassed()) {
@@ -192,34 +184,12 @@ int App::run()
         gate2.render(camera, materialShader);
         glass.render(camera, materialShader);
 
-        // New GUI frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        ImGui::SetNextWindowSize(ImVec2(400, ImGui::GetTextLineHeightWithSpacing() * 7));
-        ImGui::SetNextWindowPos(ImVec2(10, 10));
-        ImGui::Begin("FPS Counter", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings);
-        // Could be realtime if std::round(1 / deltatime);
-        ImGui::Text("FPS: %d", fps.getLastNumberOfFrames());
-        ImGui::Text("Vsync: %s", window->isVSynced() ? "True" : "False");
-        ImGui::Text("Camera Front: %f %f %f", camera.Front[0], camera.Front[1], camera.Front[2]);
-        ImGui::Text("Time: %f", std::floor(normDayTime * 24));
-        ImGui::End();
-
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
         //// Swap front and back buffers
         glfwSwapBuffers(window->getWindow());
 
         //// Poll for and process events
         glfwPollEvents();
     }
-    
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
 
     std::cout << std::endl;
 
