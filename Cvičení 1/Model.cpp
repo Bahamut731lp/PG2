@@ -16,7 +16,6 @@ Model::Model(const std::filesystem::path& filename)
 	this->meshes = std::vector<Mesh>{};
 
 	auto suffix = filename.extension().string();
-	Logger::debug(suffix);
 
 	if (suffix == ".obj") {
 		auto loader = OBJLoader(filename);
@@ -50,6 +49,7 @@ void Model::render(Camera& camera, Shader& shader)
 		shader.setUniform("material.diffuse", mesh.material.diffuse);
 		shader.setUniform("material.specular", mesh.material.specular);
 		shader.setUniform("material.shininess", mesh.material.shininess);
+		shader.setUniform("material.transparency", mesh.material.transparency);
 
 		mesh.draw(shader);
 

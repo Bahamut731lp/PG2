@@ -313,6 +313,7 @@ void OBJLoader::Parse::MTL(std::vector<std::string> input, std::string path, std
 		else if (header == "Ka") OBJLoader::Parse::ambient(tokens, currentMaterial);
 		else if (header == "Kd") OBJLoader::Parse::diffuse(tokens, currentMaterial);
 		else if (header == "Ks") OBJLoader::Parse::specular(tokens, currentMaterial);
+		else if (header == "d") OBJLoader::Parse::dissolve(tokens, currentMaterial);
 		else if (header == "Ns") {
 			currentMaterial.shininess = std::stof(tokens[0]);
 		}
@@ -326,7 +327,7 @@ void OBJLoader::Parse::MTL(std::vector<std::string> input, std::string path, std
  *
  * This function parses ambient color data from the input vector of strings and assigns it to the specified Material object.
  * The input vector should contain three strings representing the red, green, and blue components of the ambient color, respectively.
- * The ambient color components are converted to floating-point values and assigned to the corresponding elements of the Material's ambient array.
+ * The ambient color components are converted to floating-point values and assigned to the corresponding elements of the Material's ambient vector.
  *
  * @param input A vector of strings representing the ambient color data. The first string should represent the red component, the second string the green component, and the third string the blue component.
  * @param output A reference to the Material object to which the parsed ambient color data will be assigned.
@@ -343,7 +344,7 @@ void OBJLoader::Parse::ambient(std::vector<std::string> input, Material& output)
  *
  * This function parses diffuse color data from the input vector of strings and assigns it to the specified Material object.
  * The input vector should contain three strings representing the red, green, and blue components of the diffuse color, respectively.
- * The diffuse color components are converted to floating-point values and assigned to the corresponding elements of the Material's diffuse array.
+ * The diffuse color components are converted to floating-point values and assigned to the corresponding elements of the Material's diffuse vector.
  *
  * @param input A vector of strings representing the diffuse color data. The first string should represent the red component, the second string the green component, and the third string the blue component.
  * @param output A reference to the Material object to which the parsed diffuse color data will be assigned.
@@ -360,7 +361,7 @@ void OBJLoader::Parse::diffuse(std::vector<std::string> input, Material& output)
  *
  * This function parses specular color data from the input vector of strings and assigns it to the specified Material object.
  * The input vector should contain three strings representing the red, green, and blue components of the specular color, respectively.
- * The specular color components are converted to floating-point values and assigned to the corresponding elements of the Material's specular array.
+ * The specular color components are converted to floating-point values and assigned to the corresponding elements of the Material's specular vector.
  *
  * @param input A vector of strings representing the specular color data. The first string should represent the red component, the second string the green component, and the third string the blue component.
  * @param output A reference to the Material object to which the parsed specular color data will be assigned.
@@ -370,4 +371,23 @@ void OBJLoader::Parse::specular(std::vector<std::string> input, Material& output
 	output.specular[0] = std::stof(input[0]);
 	output.specular[1] = std::stof(input[1]);
 	output.specular[2] = std::stof(input[2]);
+}
+
+/**
+ * @brief Parses dissolve data from the input and assigns it to the specified Material object.
+ *
+ * This function parses dissolve data from the input vector of strings and assigns it to the specified Material object.
+ * MTL files represent transparency with dissolve attribute, which ranges from 0 to 1
+ * When dissolve is 1, the material is completely opaque.
+ * When dissolve is 0, the material is completely transparent.
+ * 
+ * The input vector should contain one string representing transparency of the object.
+ * The parsed dissolve is converted to floating-point value and assigned to the Material.
+ *
+ * @param input A vector of strings representing the transparency.
+ * @param output A reference to the Material object to which the parsed transparency will be assigned.
+ */
+void OBJLoader::Parse::dissolve(std::vector<std::string> input, Material& output)
+{
+	output.transparency = std::stof(input[0]);
 }

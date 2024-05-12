@@ -31,6 +31,7 @@ public:
         static void ambient(std::vector<std::string> input, Material& output);
         static void diffuse(std::vector<std::string> input, Material& output);
         static void specular(std::vector<std::string> input, Material& output);
+        static void dissolve(std::vector<std::string> input, Material& output);
     };
 
 private:

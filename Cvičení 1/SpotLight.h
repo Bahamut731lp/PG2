@@ -15,6 +15,6 @@ struct SpotLight {
     float quadratic = 0.032f;
 
     glm::vec3 ambient = glm::vec3{ 0.0f };
-    glm::vec3 diffusion = glm::vec3{ 50.0f };
+    glm::vec3 diffusion = glm::vec3{ 10.0f };
     glm::vec3 specular = glm::vec3{ 1.0f };
 };
