@@ -1,6 +1,11 @@
 #pragma once
 #include "Window.h"
 
+enum Scene {
+    SceneMainMenu,
+    SceneLevelOne
+};
+
 class App {
 public:
     App();
@@ -16,4 +21,5 @@ public:
     ~App();
 private:
     Window* window;
+    Scene scene;
 };

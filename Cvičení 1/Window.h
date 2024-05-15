@@ -26,6 +26,10 @@ public:
     bool isFullscreen() const;
     GLFWwindow* getWindow() const;
 
+    // Current Window Values
+    int width;
+    int height;
+
     // Window position & size restoration
     int lastWindowX;
     int lastWindowY;

@@ -16,6 +16,8 @@ Window::Window(int width, int height, const char* title, bool fullscreen, bool v
     lastWindowY = 0;
     lastWindowWidth = width;
     lastWindowHeight = height;
+    this->width = width;
+    this->height = height;
 
 
     if (!glfwInit()) {
@@ -156,7 +158,6 @@ void Window::mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
     // since default value is null pointer, which could lead
     // to crashes. We do not want that.
     if (Window::cam == nullptr) {
-        Logger::warning("No camera was assigned to the window");
         return;
     }
 
@@ -198,4 +199,10 @@ void Window::onScrollEvent(double xoffset, double yoffset) {
 
 void Window::framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
+
+    Window* instance = static_cast<Window*>(glfwGetWindowUserPointer(window));
+    if (instance) {
+        instance->width = width;
+        instance->height = height;
+    }
 }

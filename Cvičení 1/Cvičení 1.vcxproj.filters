@@ -25,10 +25,10 @@
     <Filter Include="Zdrojové soubory\Lights">
       <UniqueIdentifier>{491218bd-a11e-4da5-83f5-418fd507b4ab}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Hlavičkové soubory\GUI">
+    <Filter Include="Hlavičkové soubory\Scenes">
       <UniqueIdentifier>{cf459cc1-6dfa-4667-89f6-b12775a35337}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Zdrojové soubory\GUI">
+    <Filter Include="Zdrojové soubory\Scenes">
       <UniqueIdentifier>{53dd9c2a-147f-403c-806c-dcc603cd4f81}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -73,7 +73,7 @@
       <Filter>Zdrojové soubory</Filter>
     </ClCompile>
     <ClCompile Include="MainMenu.cpp">
-      <Filter>Zdrojové soubory\GUI</Filter>
+      <Filter>Zdrojové soubory\Scenes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -135,7 +135,7 @@
       <Filter>Hlavičkové soubory\Loaders</Filter>
     </ClInclude>
     <ClInclude Include="MainMenu.h">
-      <Filter>Hlavičkové soubory</Filter>
+      <Filter>Hlavičkové soubory\Scenes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
