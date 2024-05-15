@@ -1,10 +1,6 @@
 #pragma once
 #include "Window.h"
-
-enum Scene {
-    SceneMainMenu,
-    SceneLevelOne
-};
+#include "Scenes.h"
 
 class App {
 public:

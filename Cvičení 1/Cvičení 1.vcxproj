@@ -157,6 +157,7 @@
     <ClCompile Include="OBJLoader.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="StringUtils.cpp" />
+    <ClCompile Include="Tutorial.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -173,10 +174,12 @@
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="OBJLoader.h" />
+    <ClInclude Include="Scenes.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="SpotLight.h" />
     <ClInclude Include="StringUtils.h" />
+    <ClInclude Include="Tutorial.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>

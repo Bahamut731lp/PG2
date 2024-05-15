@@ -35,6 +35,10 @@ Model::Model(const Model& copy)
 	this->transform = glm::mat4(1.0f);
 }
 
+Model::Model()
+{
+}
+
 void Model::render(Camera& camera, Shader& shader)
 {
 	shader.activate();

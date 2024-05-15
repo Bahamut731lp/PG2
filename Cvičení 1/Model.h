@@ -18,6 +18,7 @@ public:
 
 	Model(const std::filesystem::path& filename);
 	Model(const Model& copy);
+	Model();
 
 	void render(Camera& camera, Shader& shader);
 };
