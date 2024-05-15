@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -136,21 +137,21 @@ int App::run()
         float currentFrame = glfwGetTime();
         delta = currentFrame - lastFrame;
 
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         switch (this->scene)
         {
         case Scene::SceneMainMenu:
             this->scene = MainMenu::render(ctx, window);
             break;
-        case Scene::SceneLevelOne:
+        case Scene::SceneTutorial:
             this->scene = Tutorial::render(ctx, window, delta);
             break;
         default:
             Logger::critical("Transition to the undefined scene");
             break;
         }
-
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Calculate FPS
         if (fps.hasSecondPassed()) {

@@ -1,5 +1,6 @@
 
 #include "MainMenu.h"
+#include "Tutorial.h"
 
 #include "nuklear/nuklear.h"
 #include "Window.h"
@@ -63,7 +64,8 @@ Scene MainMenu::render(nk_context* context, Window* window)
 
 
     if (isGoingToPlay) {
-        return Scene::SceneLevelOne;
+        Tutorial::init();
+        return Scene::SceneTutorial;
     }
     if (isClosingWindow) {
         glfwSetWindowShouldClose(window->getWindow(), 1);

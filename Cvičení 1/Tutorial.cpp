@@ -1,10 +1,21 @@
 #pragma once
 #include "Tutorial.h"
 
-#include "Model.h"
-#include "LightSystem.h"
+namespace Tutorial {
+	Camera* camera = nullptr;
+	Shader* materialShader = nullptr;
+	LightSystem* lights = nullptr;
+	SpotLight* spotLight = nullptr;
+	AmbientLight* ambience = nullptr;
+	PointLight* simpleLight2, * simpleLight3 = nullptr;
+	DirectionalLight* sunlight = nullptr;
+	Model* gate, * gate2 = nullptr;
+	Model* coin = nullptr;
+	Model* terrain = nullptr;
+	Model* glass = nullptr;
+}
 
-void Tutorial::init(nk_context* context)
+void Tutorial::init()
 {
 	using namespace Tutorial;
 
@@ -25,6 +36,12 @@ void Tutorial::init(nk_context* context)
 	gate2 = new Model(*gate);
 
 	// Define lights
+	lights = new LightSystem;
+	spotLight = new SpotLight;
+	ambience = new AmbientLight;
+	simpleLight2 = new PointLight;
+	simpleLight3 = new PointLight;
+	sunlight = new DirectionalLight;
 
 	// Define initial transforms for all objects
 	gate->transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 10.0f, 0.0f));
@@ -51,19 +68,20 @@ void Tutorial::init(nk_context* context)
 	simpleLight3->position = glm::vec3(-10.0f, 15.0f, 0.0f);
 
 	// The light is not moving, so we do not have to update position in shader every frame
-	lights->add(*sunlight);
 	lights->add(*ambience);
 	lights->add(*spotLight);
 	lights->add(*simpleLight2);
 	lights->add(*simpleLight3);
 	lights->add(*materialShader);
+	lights->add(*sunlight);
 
 	lights->calc();
+
+	glfwSetInputMode(glfwGetCurrentContext(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 Scene Tutorial::render(nk_context* context, Window* window, float delta)
 {
-	using namespace Tutorial;
 	const int ONE_DAY = 16;
 	auto daytime = glm::sin((glm::pi<float>() * glfwGetTime() / ONE_DAY) - glm::half_pi<float>());
 

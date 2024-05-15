@@ -1,7 +1,11 @@
 #ifndef OPENGL_WINDOW_H
 #define OPENGL_WINDOW_H
 
+#include <GL/glew.h>
+#include <GL/wglew.h>
 #include <GLFW/glfw3.h>
+#include "glm/glm.hpp"
+
 #include <iostream>
 #include "Camera.h"
 

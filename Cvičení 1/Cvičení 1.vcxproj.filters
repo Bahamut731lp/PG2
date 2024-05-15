@@ -107,9 +107,6 @@
     <ClInclude Include="Logger.h">
       <Filter>Hlavičkové soubory</Filter>
     </ClInclude>
-    <ClInclude Include="OBJLoader.h">
-      <Filter>Hlavičkové soubory\Loaders</Filter>
-    </ClInclude>
     <ClInclude Include="Model.h">
       <Filter>Hlavičkové soubory</Filter>
     </ClInclude>
@@ -142,6 +139,9 @@
     </ClInclude>
     <ClInclude Include="Tutorial.h">
       <Filter>Hlavičkové soubory\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="OBJLoader.h">
+      <Filter>Hlavičkové soubory</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
