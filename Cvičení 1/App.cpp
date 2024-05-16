@@ -129,6 +129,12 @@ int App::run()
     // Initialize first scene
     MainMenu::init(ctx);
 
+    std::shared_ptr<int> progress(new int(0));
+
+    // Load all shaders
+    auto materialShader = new Shader(std::filesystem::path("./assets/shaders/material.vert"), std::filesystem::path("./assets/shaders/material.frag"));
+    Tutorial::materialShader = materialShader;
+
     while (!glfwWindowShouldClose(window->getWindow()))
     {
         glfwPollEvents();
@@ -150,7 +156,7 @@ int App::run()
             this->scene = Tutorial::render(ctx, window, delta);
             break;
         case Scene::LoadToTutorial:
-            this->scene = Tutorial::load(ctx, window);
+            this->scene = Tutorial::load(ctx, window, progress);
             break;
         default:
             Logger::critical("Transition to the undefined scene");

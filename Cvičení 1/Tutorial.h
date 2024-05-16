@@ -7,21 +7,22 @@
 
 #include "nuklear/types.h"
 
-namespace Tutorial {
-	extern Camera* camera;
-	extern Shader* materialShader;
-	extern LightSystem* lights;
-	extern SpotLight* spotLight;
-	extern AmbientLight* ambience;
-	extern PointLight* simpleLight2, * simpleLight3;
-	extern DirectionalLight* sunlight;
-	extern Model* gate, * gate2;
-	extern Model* coin;
-	extern Model* terrain;
-	extern Model* glass;
+class Tutorial {
+public:	
+	static void init();
+	static Scene render(nk_context* context, Window* window, float delta);
+	static Scene load(nk_context* context, Window* window, std::shared_ptr<int> progress);
+	static Shader* materialShader;
 
-	extern void init();
-	extern Scene render(nk_context* context, Window* window, float delta);
-	extern Scene load(nk_context* context, Window* window);
-}
-
+private:
+	static Camera* camera;
+	static LightSystem* lights;
+	static SpotLight* spotLight;
+	static AmbientLight* ambience;
+	static PointLight* simpleLight2, * simpleLight3;
+	static DirectionalLight* sunlight;
+	static Model* gate, * gate2;
+	static Model* coin;
+	static Model* terrain;
+	static Model* glass;
+};

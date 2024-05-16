@@ -1,30 +1,25 @@
 #pragma once
 #include "Tutorial.h"
+#include "Logger.h"
+#include <thread>
 
-namespace Tutorial {
-	Camera* camera = nullptr;
-	Shader* materialShader = nullptr;
-	LightSystem* lights = nullptr;
-	SpotLight* spotLight = nullptr;
-	AmbientLight* ambience = nullptr;
-	PointLight* simpleLight2, * simpleLight3 = nullptr;
-	DirectionalLight* sunlight = nullptr;
-	Model* gate, * gate2 = nullptr;
-	Model* coin = nullptr;
-	Model* terrain = nullptr;
-	Model* glass = nullptr;
-}
+Camera* Tutorial::camera = nullptr;
+Shader* Tutorial::materialShader = nullptr;
+LightSystem* Tutorial::lights = nullptr;
+SpotLight* Tutorial::spotLight = nullptr;
+AmbientLight* Tutorial::ambience = nullptr;
+PointLight* Tutorial::simpleLight2, *Tutorial::simpleLight3 = nullptr;
+DirectionalLight* Tutorial::sunlight = nullptr;
+Model* Tutorial::gate, * Tutorial::gate2 = nullptr;
+Model* Tutorial::coin = nullptr;
+Model* Tutorial::terrain = nullptr;
+Model* Tutorial::glass = nullptr;
 
 void Tutorial::init()
 {
-	using namespace Tutorial;
-
 	// Create camera
 	camera = new Camera{ glm::vec3(-2.50f, 15.0f, 0.0f) };
 	Window::cam = camera;
-
-	// Load all shaders
-	materialShader = new Shader(std::filesystem::path("./assets/shaders/material.vert"), std::filesystem::path("./assets/shaders/material.frag"));
 
 	// Load all models needed for scene
 	gate = new Model("./assets/obj/gate.obj");
@@ -74,10 +69,6 @@ void Tutorial::init()
 	lights->add(*simpleLight3);
 	lights->add(*materialShader);
 	lights->add(*sunlight);
-
-	lights->calc();
-
-	glfwSetInputMode(glfwGetCurrentContext(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 Scene Tutorial::render(nk_context* context, Window* window, float delta)
@@ -104,23 +95,26 @@ Scene Tutorial::render(nk_context* context, Window* window, float delta)
 	return Scene::SceneTutorial;
 }
 
-Scene Tutorial::load(nk_context* context, Window* window)
+Scene Tutorial::load(nk_context* context, Window* window, std::shared_ptr<int> progress)
 {
+	// Used to be thread here, but I just gave up trying to make it work with OpenGL.
+	if (*progress == 1) {
+		Tutorial::init();
+		glfwSetInputMode(window->getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		return Scene::SceneTutorial;
+	}
+
 	// Opening new window
 	if (!nk_begin(context, "Loading", nk_rect(0, 0, window->width, window->height), NK_WINDOW_NO_SCROLLBAR | NK_WINDOW_BACKGROUND)) {
 		nk_end(context);
-		return Scene::SceneMainMenu;
+		return Scene::LoadToTutorial;
 	}
 
-	nk_layout_row_dynamic(context, 30, 1);
-	nk_label(context, "Loading...", NK_TEXT_CENTERED);
-
-	// Display progress bar
-	nk_layout_row_dynamic(context, 20, 1);
-	nk_size currentValue = 50;
-	nk_progress(context, &currentValue, 100, NK_FIXED);
+	nk_layout_row_dynamic(context, window->height - 25, 1);
+	nk_label(context, "Loading...", NK_TEXT_ALIGN_BOTTOM | NK_TEXT_ALIGN_RIGHT);
 	
 	nk_end(context);
+	*progress = 1;
 
 	return Scene::LoadToTutorial;
 }
