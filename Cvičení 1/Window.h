@@ -1,7 +1,11 @@
 #ifndef OPENGL_WINDOW_H
 #define OPENGL_WINDOW_H
 
+#include <GL/glew.h>
+#include <GL/wglew.h>
 #include <GLFW/glfw3.h>
+#include "glm/glm.hpp"
+
 #include <iostream>
 #include "Camera.h"
 
@@ -25,6 +29,10 @@ public:
     bool isVSynced() const;
     bool isFullscreen() const;
     GLFWwindow* getWindow() const;
+
+    // Current Window Values
+    int width;
+    int height;
 
     // Window position & size restoration
     int lastWindowX;

@@ -1,5 +1,6 @@
 #pragma once
 #include "Window.h"
+#include "Scenes.h"
 
 class App {
 public:
@@ -7,6 +8,7 @@ public:
 
     bool init(void);
     void report(void);
+    void configure(void);
     int run(void);
 
     void addMouseHandler(void);
@@ -15,4 +17,5 @@ public:
     ~App();
 private:
     Window* window;
+    Scene scene;
 };

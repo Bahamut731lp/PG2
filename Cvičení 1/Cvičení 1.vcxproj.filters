@@ -13,12 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Hlavičkové soubory\imgui">
-      <UniqueIdentifier>{c04e9e02-5b68-4337-930c-3946f587c46b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Zdrojové soubory\imgui">
-      <UniqueIdentifier>{80d3e220-308f-43ee-9ecd-bb84140b8036}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Zdrojové soubory\Loaders">
       <UniqueIdentifier>{486452da-c729-45cc-b801-f9293fd2a18d}</UniqueIdentifier>
     </Filter>
@@ -28,8 +22,11 @@
     <Filter Include="Hlavičkové soubory\Lights">
       <UniqueIdentifier>{8858e9f0-e016-47fa-a14d-b919168f272f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Zdrojové soubory\Lights">
-      <UniqueIdentifier>{491218bd-a11e-4da5-83f5-418fd507b4ab}</UniqueIdentifier>
+    <Filter Include="Hlavičkové soubory\Scenes">
+      <UniqueIdentifier>{cf459cc1-6dfa-4667-89f6-b12775a35337}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Zdrojové soubory\Scenes">
+      <UniqueIdentifier>{53dd9c2a-147f-403c-806c-dcc603cd4f81}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -40,9 +37,6 @@
       <Filter>Zdrojové soubory</Filter>
     </ClCompile>
     <ClCompile Include="FrameCounter.cpp">
-      <Filter>Zdrojové soubory</Filter>
-    </ClCompile>
-    <ClCompile Include="DebugOutputManager.cpp">
       <Filter>Zdrojové soubory</Filter>
     </ClCompile>
     <ClCompile Include="Window.cpp">
@@ -60,27 +54,6 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Zdrojové soubory</Filter>
     </ClCompile>
-    <ClCompile Include="imgui\imgui_widgets.cpp">
-      <Filter>Zdrojové soubory\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\imgui.cpp">
-      <Filter>Zdrojové soubory\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\imgui_demo.cpp">
-      <Filter>Zdrojové soubory\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\imgui_draw.cpp">
-      <Filter>Zdrojové soubory\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\imgui_impl_glfw.cpp">
-      <Filter>Zdrojové soubory\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\imgui_impl_opengl3.cpp">
-      <Filter>Zdrojové soubory\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\imgui_tables.cpp">
-      <Filter>Zdrojové soubory\imgui</Filter>
-    </ClCompile>
     <ClCompile Include="Logger.cpp">
       <Filter>Zdrojové soubory</Filter>
     </ClCompile>
@@ -92,6 +65,15 @@
     </ClCompile>
     <ClCompile Include="LightSystem.cpp">
       <Filter>Zdrojové soubory</Filter>
+    </ClCompile>
+    <ClCompile Include="MainMenu.cpp">
+      <Filter>Zdrojové soubory\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugOutputManager.cpp">
+      <Filter>Zdrojové soubory</Filter>
+    </ClCompile>
+    <ClCompile Include="Tutorial.cpp">
+      <Filter>Zdrojové soubory\Scenes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -122,62 +104,44 @@
     <ClInclude Include="Camera.h">
       <Filter>Hlavičkové soubory</Filter>
     </ClInclude>
-    <ClInclude Include="imgui\imstb_truetype.h">
-      <Filter>Hlavičkové soubory\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\imconfig.h">
-      <Filter>Hlavičkové soubory\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\imgui.h">
-      <Filter>Hlavičkové soubory\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\imgui_impl_glfw.h">
-      <Filter>Hlavičkové soubory\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\imgui_impl_opengl3.h">
-      <Filter>Hlavičkové soubory\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\imgui_impl_opengl3_loader.h">
-      <Filter>Hlavičkové soubory\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\imgui_internal.h">
-      <Filter>Hlavičkové soubory\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\imstb_rectpack.h">
-      <Filter>Hlavičkové soubory\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\imstb_textedit.h">
-      <Filter>Hlavičkové soubory\imgui</Filter>
-    </ClInclude>
     <ClInclude Include="Logger.h">
       <Filter>Hlavičkové soubory</Filter>
     </ClInclude>
-    <ClInclude Include="OBJLoader.h">
-      <Filter>Hlavičkové soubory\Loaders</Filter>
-    </ClInclude>
     <ClInclude Include="Model.h">
       <Filter>Hlavičkové soubory</Filter>
     </ClInclude>
     <ClInclude Include="Model.h">
-      <Filter>Hlavičkové soubory</Filter>
-    </ClInclude>
-    <ClInclude Include="LightSystem.h">
-      <Filter>Hlavičkové soubory</Filter>
-    </ClInclude>
-    <ClInclude Include="AmbientLight.h">
-      <Filter>Hlavičkové soubory</Filter>
-    </ClInclude>
-    <ClInclude Include="DirectionalLight.h">
-      <Filter>Hlavičkové soubory</Filter>
-    </ClInclude>
-    <ClInclude Include="PointLight.h">
-      <Filter>Hlavičkové soubory</Filter>
-    </ClInclude>
-    <ClInclude Include="SpotLight.h">
       <Filter>Hlavičkové soubory</Filter>
     </ClInclude>
     <ClInclude Include="Material.h">
       <Filter>Hlavičkové soubory\Loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="MainMenu.h">
+      <Filter>Hlavičkové soubory\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="PointLight.h">
+      <Filter>Hlavičkové soubory\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="SpotLight.h">
+      <Filter>Hlavičkové soubory\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="AmbientLight.h">
+      <Filter>Hlavičkové soubory\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionalLight.h">
+      <Filter>Hlavičkové soubory\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="LightSystem.h">
+      <Filter>Hlavičkové soubory\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="Scenes.h">
+      <Filter>Hlavičkové soubory</Filter>
+    </ClInclude>
+    <ClInclude Include="Tutorial.h">
+      <Filter>Hlavičkové soubory\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="OBJLoader.h">
+      <Filter>Hlavičkové soubory</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

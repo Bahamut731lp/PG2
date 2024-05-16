@@ -38,6 +38,7 @@ public:
 
 	// Constructor
 	Camera(glm::vec3 position);
+	Camera();
 
 	glm::mat4 getViewMatrix();
 	glm::mat4 getProjectionMatrix();

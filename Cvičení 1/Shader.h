@@ -4,9 +4,9 @@
 #include <filesystem>
 #include <iostream>
 
+#include <GL/glew.h> 
 #include <glm/glm.hpp> 
 #include <glm/ext.hpp>
-#include <GL/glew.h> 
 
 class Shader {
 public:
