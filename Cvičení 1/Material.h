@@ -2,6 +2,11 @@
 
 #include <glm/glm.hpp>
 
+struct Texture {
+    int id = -1;
+    glm::vec3 scale;
+};
+
 struct Material {
     std::string name;
     glm::vec3 ambient;
@@ -9,4 +14,6 @@ struct Material {
     glm::vec3 specular;
     float transparency = 1.0f;
     float shininess;
+
+    Texture texture;
 };

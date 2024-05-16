@@ -1,4 +1,8 @@
 #version 460 core
+
+in vec3 FragPos;  
+in vec3 Normal; 
+in vec2 TexCoord;
 out vec4 FragColor;
 
 #define MAX_AMBIENT_LIGHTS 8
@@ -12,6 +16,8 @@ struct Material {
     vec3 specular;    
     float shininess;
     float transparency;
+    sampler2D texture;
+    int isTextured;
 }; 
 
 struct AmbientLight {
@@ -52,9 +58,6 @@ struct DirectionaLight {
     vec3 diffuse;
     vec3 specular;
 };  
-
-in vec3 FragPos;  
-in vec3 Normal;  
   
 uniform vec3 viewPos;
 uniform Material material;
@@ -178,6 +181,11 @@ void main()
 
     // Gamma Correction
     accumulator = pow(accumulator, vec3(1.0/2.2));
+
+    if (material.isTextured == 1) {
+        accumulator = texture(material.texture, TexCoord).rgb;
+    }
+
     
     FragColor = vec4(accumulator, material.transparency);
 } 

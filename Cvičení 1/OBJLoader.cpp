@@ -1,6 +1,9 @@
 ﻿#pragma once
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 #include <sstream>
 #include <numeric>
+
 #include "Logger.h"
 #include "Vertex.h"
 #include "Material.h"
@@ -314,9 +317,8 @@ void OBJLoader::Parse::MTL(std::vector<std::string> input, std::string path, std
 		else if (header == "Kd") OBJLoader::Parse::diffuse(tokens, currentMaterial);
 		else if (header == "Ks") OBJLoader::Parse::specular(tokens, currentMaterial);
 		else if (header == "d") OBJLoader::Parse::dissolve(tokens, currentMaterial);
-		else if (header == "Ns") {
-			currentMaterial.shininess = std::stof(tokens[0]);
-		}
+		else if (header == "Ns") currentMaterial.shininess = std::stof(tokens[0]);
+		else if (header == "map_Kd") OBJLoader::Parse::texture(tokens, currentMaterial);
 	}
 
 	if (!currentMaterial.name.empty()) materials[currentMaterial.name] = currentMaterial;
@@ -390,4 +392,34 @@ void OBJLoader::Parse::specular(std::vector<std::string> input, Material& output
 void OBJLoader::Parse::dissolve(std::vector<std::string> input, Material& output)
 {
 	output.transparency = std::stof(input[0]);
+}
+
+void OBJLoader::Parse::texture(std::vector<std::string> input, Material& output)
+{
+	GLuint textureID;
+	int width, height, nrChannels;
+	auto texture = Texture{};
+	auto path = input.back();
+
+	unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
+
+	texture.scale = glm::vec3(1.0f);
+
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	// set the texture wrapping parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	// set texture filtering parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	texture.id = textureID;
+	Logger::info("Created Texture with ID: " + std::to_string(textureID));
+	output.texture = texture;
+
+	stbi_image_free(data);
 }

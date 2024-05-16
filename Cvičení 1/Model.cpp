@@ -55,7 +55,22 @@ void Model::render(Camera& camera, Shader& shader)
 		shader.setUniform("material.shininess", mesh.material.shininess);
 		shader.setUniform("material.transparency", mesh.material.transparency);
 
+		if (mesh.material.texture.id != -1) {
+			// We have to send Texture Unit to the uniform, and then activate the texture with it's ID on that texture unit.
+			shader.setUniform("material.texture", 0);
+			shader.setUniform("material.isTextured", 1);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, mesh.material.texture.id);
+		}
+		else {
+			shader.setUniform("material.isTextured", 0);
+		}
+
 		mesh.draw(shader);
+
+		// Cleanup
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 
 		//Logger::warning(mesh.material.name + " (" + std::to_string(mesh.material.diffuse[0]) + ", " + std::to_string(mesh.material.diffuse[1]) + ", " + std::to_string(mesh.material.diffuse[2]) + ")");
 	}
