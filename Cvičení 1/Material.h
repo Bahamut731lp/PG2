@@ -4,7 +4,7 @@
 
 struct Texture {
     int id = -1;
-    glm::vec3 scale;
+    glm::vec3 scale = glm::vec3(5.0f);
 };
 
 struct Material {

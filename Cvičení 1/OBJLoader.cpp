@@ -400,14 +400,22 @@ void OBJLoader::Parse::texture(std::vector<std::string> input, Material& output)
 	int width, height, nrChannels;
 	auto texture = Texture{};
 	auto path = input.back();
+	auto format = GL_RGBA;
 
 	unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
 
-	texture.scale = glm::vec3(1.0f);
+	if (nrChannels == 1)
+		format = GL_RED;
+	else if (nrChannels == 3)
+		format = GL_RGB;
+	else if (nrChannels == 4)
+		format = GL_RGBA;
+
+	texture.scale = glm::vec3(5.0f);
 
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	// set the texture wrapping parameters
