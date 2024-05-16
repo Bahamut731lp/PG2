@@ -106,5 +106,21 @@ Scene Tutorial::render(nk_context* context, Window* window, float delta)
 
 Scene Tutorial::load(nk_context* context, Window* window)
 {
+	// Opening new window
+	if (!nk_begin(context, "Loading", nk_rect(0, 0, window->width, window->height), NK_WINDOW_NO_SCROLLBAR | NK_WINDOW_BACKGROUND)) {
+		nk_end(context);
+		return Scene::SceneMainMenu;
+	}
+
+	nk_layout_row_dynamic(context, 30, 1);
+	nk_label(context, "Loading...", NK_TEXT_CENTERED);
+
+	// Display progress bar
+	nk_layout_row_dynamic(context, 20, 1);
+	nk_size currentValue = 50;
+	nk_progress(context, &currentValue, 100, NK_FIXED);
+	
+	nk_end(context);
+
 	return Scene::LoadToTutorial;
 }
