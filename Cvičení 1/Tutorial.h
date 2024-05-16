@@ -22,5 +22,6 @@ namespace Tutorial {
 
 	extern void init();
 	extern Scene render(nk_context* context, Window* window, float delta);
+	extern Scene load(nk_context* context, Window* window);
 }
 

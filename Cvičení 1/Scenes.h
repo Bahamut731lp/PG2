@@ -2,5 +2,6 @@
 enum Scene {
     SceneMainMenu,
     SceneTutorial,
-    SceneLevelOne
+    SceneLevelOne,
+    LoadToTutorial
 };

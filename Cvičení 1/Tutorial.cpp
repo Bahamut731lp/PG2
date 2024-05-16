@@ -103,3 +103,8 @@ Scene Tutorial::render(nk_context* context, Window* window, float delta)
 
 	return Scene::SceneTutorial;
 }
+
+Scene Tutorial::load(nk_context* context, Window* window)
+{
+	return Scene::LoadToTutorial;
+}

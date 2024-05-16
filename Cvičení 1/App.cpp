@@ -149,6 +149,9 @@ int App::run()
         case Scene::SceneTutorial:
             this->scene = Tutorial::render(ctx, window, delta);
             break;
+        case Scene::LoadToTutorial:
+            this->scene = Tutorial::load(ctx, window);
+            break;
         default:
             Logger::critical("Transition to the undefined scene");
             break;

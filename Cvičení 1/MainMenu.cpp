@@ -64,8 +64,7 @@ Scene MainMenu::render(nk_context* context, Window* window)
 
 
     if (isGoingToPlay) {
-        Tutorial::init();
-        return Scene::SceneTutorial;
+        return Scene::LoadToTutorial;
     }
     if (isClosingWindow) {
         glfwSetWindowShouldClose(window->getWindow(), 1);
