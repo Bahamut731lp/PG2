@@ -412,6 +412,9 @@ void OBJLoader::Parse::texture(std::vector<std::string> input, Material& output)
 		format = GL_RGBA;
 
 	texture.scale = glm::vec3(5.0f);
+	texture.scale.x = std::stof(input[1]);
+	texture.scale.y = std::stof(input[2]);
+	texture.scale.z = std::stof(input[3]);
 
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);

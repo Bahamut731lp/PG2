@@ -22,13 +22,7 @@ void Tutorial::init()
 	Window::cam = camera;
 
 	// Load all models needed for scene
-	gate = new Model("./assets/obj/gate.obj");
-	coin = new Model("./assets/obj/coin.obj");
 	terrain = new Model("./assets/obj/level_1.obj");
-	glass = new Model("./assets/obj/glass.obj");
-
-	// Create another instances if needed without having to read files over again
-	gate2 = new Model(*gate);
 
 	// Define lights
 	lights = new LightSystem;
@@ -39,17 +33,6 @@ void Tutorial::init()
 	sunlight = new DirectionalLight;
 
 	// Define initial transforms for all objects
-	gate->transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 10.0f, 0.0f));
-	gate->transform = glm::scale(gate->transform, glm::vec3(0.5f));
-
-	gate2->transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 10.0f, 0.0f));
-	gate2->transform = glm::scale(gate2->transform, glm::vec3(0.8f));
-
-	coin->transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 10.0f, 0.0f));
-	coin->transform = glm::scale(coin->transform, glm::vec3(0.25f));
-
-	glass->transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 10.0f, 0.0f));
-
 	ambience->color = glm::vec3(1.0f);
 	ambience->intensity = 0.05f;
 
@@ -87,10 +70,6 @@ Scene Tutorial::render(nk_context* context, Window* window, float delta)
 
 	// Render all models
 	terrain->render(*camera, *materialShader);
-	coin->render(*camera, *materialShader);
-	gate->render(*camera, *materialShader);
-	gate2->render(*camera, *materialShader);
-	glass->render(*camera, *materialShader);
 
 	return Scene::SceneTutorial;
 }
