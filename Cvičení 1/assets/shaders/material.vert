@@ -33,13 +33,11 @@ void main()
     FragPos = vec3(transform * vec4(aPos, 1.0));
     Normal = mat3(transpose(inverse(transform))) * aNormal;
 
-    TexCoord = material.texture.scale[0] * aTexCoord;
-
-    /*if (material.texture.isTextured == 1) {
-        TexCoord = vec2(aTexCoord.x / material.texture.scale.x, aTexCoord.y / material.texture.scale.y);
+    if (material.texture.isTextured == 1) {
+        TexCoord = vec2(aTexCoord.x * material.texture.scale.x, aTexCoord.y * material.texture.scale.y);
     } else {
         TexCoord = vec2(aTexCoord.x, aTexCoord.y); 
-    }*/
+    }
     
     gl_Position = projection * view * vec4(FragPos, 1.0);
 }

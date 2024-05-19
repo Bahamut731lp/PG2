@@ -126,10 +126,6 @@ void Window::onKeyEvent(int key, int action) {
 
 void Window::handle_key_press(int key, int action) {
     switch (key) {
-        case GLFW_KEY_ESCAPE: {
-            glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-            break;
-        }
         case GLFW_KEY_F: {
             fullscreen = !fullscreen;
             setFullscreen(fullscreen);

@@ -153,7 +153,7 @@ int App::run()
             this->scene = MainMenu::render(ctx, window);
             break;
         case Scene::SceneTutorial:
-            this->scene = Tutorial::render(ctx, window, delta);
+            this->scene = Tutorial::render(ctx, window, delta, fps.getLastNumberOfFrames());
             break;
         case Scene::LoadToTutorial:
             this->scene = Tutorial::load(ctx, window, progress);
