@@ -4,24 +4,24 @@
 #include "Shader.h"
 #include "PointLight.h"
 
-void LightSystem::add(AmbientLight& light)
+void LightSystem::add(AmbientLight* light)
 {
-    ambientLights.push_back(&light);
+    ambientLights.push_back(light);
 }
 
-void LightSystem::add(PointLight& light)
+void LightSystem::add(PointLight* light)
 {
-    pointLights.push_back(&light);
+    pointLights.push_back(light);
 }
 
-void LightSystem::add(SpotLight& light)
+void LightSystem::add(SpotLight* light)
 {
-    spotLights.push_back(&light);
+    spotLights.push_back(light);
 }
 
-void LightSystem::add(DirectionalLight& light)
+void LightSystem::add(DirectionalLight* light)
 {
-    directionalLights.push_back(&light);
+    directionalLights.push_back(light);
 }
 
 void LightSystem::add(Shader& shader)

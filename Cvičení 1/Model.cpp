@@ -49,14 +49,31 @@ void Model::render(Camera& camera, Shader& shader)
 
 	for (Mesh mesh : meshes)
 	{
-		//shader.setUniform("material.ambient", mesh.material.ambient);
+		// Set color information
 		shader.setUniform("material.diffuse", mesh.material.diffuse);
 		shader.setUniform("material.specular", mesh.material.specular);
 		shader.setUniform("material.shininess", mesh.material.shininess);
 		shader.setUniform("material.transparency", mesh.material.transparency);
 
+		// Texture, if applicable.
+		if (mesh.material.texture.id != -1) {
+			// We have to send Texture Unit to the uniform
+			shader.setUniform("material.texture.textureUnit", 0);
+			shader.setUniform("material.texture.isTextured", 1);
+			shader.setUniform("material.texture.scale", mesh.material.texture.scale);
+            
+			//and then activate the texture with it's ID on that texture unit.
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, mesh.material.texture.id);
+		}
+		else {
+			shader.setUniform("material.texture.isTextured", 0);
+		}
+
 		mesh.draw(shader);
 
-		//Logger::warning(mesh.material.name + " (" + std::to_string(mesh.material.diffuse[0]) + ", " + std::to_string(mesh.material.diffuse[1]) + ", " + std::to_string(mesh.material.diffuse[2]) + ")");
+		// Cleanup
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 }

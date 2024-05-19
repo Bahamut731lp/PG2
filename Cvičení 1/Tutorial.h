@@ -10,7 +10,7 @@
 class Tutorial {
 public:	
 	static void init();
-	static Scene render(nk_context* context, Window* window, float delta);
+	static Scene render(nk_context* context, Window* window, float delta, int fps);
 	static Scene load(nk_context* context, Window* window, std::shared_ptr<int> progress);
 	static Shader* materialShader;
 
@@ -21,7 +21,6 @@ private:
 	static AmbientLight* ambience;
 	static PointLight* simpleLight2, * simpleLight3;
 	static DirectionalLight* sunlight;
-	static Model* gate, * gate2;
 	static Model* coin;
 	static Model* terrain;
 	static Model* glass;

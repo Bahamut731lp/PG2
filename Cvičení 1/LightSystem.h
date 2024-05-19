@@ -15,10 +15,10 @@ class LightSystem {
 public:
     LightSystem() = default;
 
-    void add(AmbientLight& light);
-    void add(PointLight& light);
-    void add(SpotLight& light);
-    void add(DirectionalLight& light);
+    void add(AmbientLight* light);
+    void add(PointLight* light);
+    void add(SpotLight* light);
+    void add(DirectionalLight* light);
     void add(Shader& shader);
     void calc();
 

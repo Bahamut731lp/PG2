@@ -1,4 +1,8 @@
 #version 460 core
+
+in vec3 FragPos;  
+in vec3 Normal; 
+in vec2 TexCoord;
 out vec4 FragColor;
 
 #define MAX_AMBIENT_LIGHTS 8
@@ -6,12 +10,19 @@ out vec4 FragColor;
 #define MAX_DIRECTIONAL_LIGHTS 16
 #define MAX_SPOT_LIGHTS 8
 
+struct Texture {
+    sampler2D textureUnit;
+    int isTextured;
+    vec3 scale;
+};
+
 struct Material {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;    
     float shininess;
     float transparency;
+    Texture texture;
 }; 
 
 struct AmbientLight {
@@ -52,9 +63,6 @@ struct DirectionaLight {
     vec3 diffuse;
     vec3 specular;
 };  
-
-in vec3 FragPos;  
-in vec3 Normal;  
   
 uniform vec3 viewPos;
 uniform Material material;
@@ -65,10 +73,14 @@ uniform SpotLight spotLights[MAX_SPOT_LIGHTS];
 uniform DirectionaLight directionalLights[MAX_DIRECTIONAL_LIGHTS];
 
 vec3 getAmbientLight(AmbientLight light, Material material) {
-    return light.color * light.intensity * material.diffuse;
+    if (material.texture.isTextured == 1) {
+        return light.color * light.intensity * texture(material.texture.textureUnit, TexCoord).rgb;
+    } else {
+        return light.color * light.intensity * material.diffuse;
+    }
 }
 
-vec3 getPointLight(PointLight light, Material material, vec3 normal, vec3 fragPos, vec3 viewDir) {
+vec3 getPointLight(PointLight light, Material material, vec3 normal, vec3 fragPos, vec3 viewDir, vec2 TexCoord) {
     vec3 lightDir = normalize(light.position - fragPos);
     vec3 halfwayDir = normalize(lightDir + viewDir);
     
@@ -82,17 +94,25 @@ vec3 getPointLight(PointLight light, Material material, vec3 normal, vec3 fragPo
     float distance = length(light.position - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
 
-    // combine results
-    vec3 ambient = light.ambient * material.diffuse;
-    vec3 diffuse = light.diffuse * diff * material.diffuse;
-    vec3 specular = light.specular * spec * material.specular;
+    vec3 ambient, diffuse, specular;
+
+    if (material.texture.isTextured == 1) {
+        ambient = light.ambient * texture(material.texture.textureUnit, TexCoord).rgb;
+        diffuse = light.diffuse * diff * texture(material.texture.textureUnit, TexCoord).rgb;
+        specular = light.specular * spec * texture(material.texture.textureUnit, TexCoord).rgb;
+    } else {
+        ambient = light.ambient * material.diffuse;
+        diffuse = light.diffuse * diff * material.diffuse;
+        specular = light.specular * spec * material.specular;
+    }
+
     ambient *= attenuation;
     diffuse *= attenuation;
     specular *= attenuation;
     return (ambient + diffuse + specular);
 }
 
-vec3 getSpotLight(SpotLight light, Material material, vec3 normal, vec3 fragPos, vec3 viewDir) {
+vec3 getSpotLight(SpotLight light, Material material, vec3 normal, vec3 fragPos, vec3 viewDir, vec2 TexCoord) {
     vec3 lightDir = normalize(light.position - fragPos);
     vec3 halfwayDir = normalize(lightDir + viewDir);
     
@@ -111,11 +131,18 @@ vec3 getSpotLight(SpotLight light, Material material, vec3 normal, vec3 fragPos,
     float epsilon = light.cutOff - light.outerCutOff;
     float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
     
-    // combine results
-    vec3 ambient = light.ambient * material.diffuse;
-    vec3 diffuse = light.diffuse * diff * material.diffuse;
-    vec3 specular = light.specular * spec * material.specular;
-    
+    vec3 ambient, diffuse, specular;
+
+    if (material.texture.isTextured == 1) {
+        ambient = light.ambient * texture(material.texture.textureUnit, TexCoord).rgb;
+        diffuse = light.diffuse * diff * texture(material.texture.textureUnit, TexCoord).rgb;
+        specular = light.specular * spec * texture(material.texture.textureUnit, TexCoord).rgb;
+    } else {
+        ambient = light.ambient * material.diffuse;
+        diffuse = light.diffuse * diff * material.diffuse;
+        specular = light.specular * spec * material.specular;
+    }
+
     ambient *= attenuation * intensity;
     diffuse *= attenuation * intensity;
     specular *= attenuation * intensity;
@@ -123,22 +150,24 @@ vec3 getSpotLight(SpotLight light, Material material, vec3 normal, vec3 fragPos,
     return (ambient + diffuse + specular);
 }
 
-vec3 getDirectionaLight(DirectionaLight light, Material material, vec3 normal, vec3 viewDir) {
+vec3 getDirectionaLight(DirectionaLight light, Material material, vec3 normal, vec3 viewDir, vec2 TexCoord) {
     vec3 lightDir = normalize(-light.direction);
     vec3 halfwayDir = normalize(lightDir + viewDir);
 
     // diffuse shading
     float diff = max(dot(normal, lightDir), 0.0);
     
-    // specular shading
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), material.shininess);
+    vec3 ambient, diffuse;
+
+    if (material.texture.isTextured == 1) {
+        ambient = light.ambient * texture(material.texture.textureUnit, TexCoord).rgb;
+        diffuse = light.diffuse * diff * texture(material.texture.textureUnit, TexCoord).rgb;
+    } else {
+        ambient = light.ambient * material.diffuse;
+        diffuse = light.diffuse * diff * material.diffuse;
+    }
     
-    // combine results
-    vec3 ambient = light.ambient * material.diffuse;
-    vec3 diffuse = light.diffuse * diff * material.diffuse;
-    vec3 specular = light.specular * spec * material.specular;
-    
-    return (ambient + diffuse + specular);
+    return (ambient + diffuse);
 }
 
 
@@ -155,25 +184,25 @@ void main()
         accumulator += getAmbientLight(ambientLights[i], material);
     }
 
-    for (int i = 0; i < MAX_POINTS_LIGHTS; i++) {
+    for (int i = 0; i < MAX_DIRECTIONAL_LIGHTS; i++) {
         // if light is not shining anything, skip it.
-        if (pointLights[i].diffuse == vec3(0.0f)) continue;
+        if (directionalLights[i].diffuse == vec3(0.0f)) continue;
 
-        accumulator += getPointLight(pointLights[i], material, norm, FragPos, viewDir);
+        accumulator += getDirectionaLight(directionalLights[i], material, norm, viewDir, TexCoord);
     }
 
     for (int i = 0; i < MAX_SPOT_LIGHTS; i++) {
         // if light is not shining anything, skip it.
         if (spotLights[i].diffuse == vec3(0.0f)) continue;
 
-        accumulator += getSpotLight(spotLights[i], material, norm, FragPos, viewDir);
+        accumulator += getSpotLight(spotLights[i], material, norm, FragPos, viewDir, TexCoord);
     }
 
-    for (int i = 0; i < MAX_DIRECTIONAL_LIGHTS; i++) {
+    for (int i = 0; i < MAX_POINTS_LIGHTS; i++) {
         // if light is not shining anything, skip it.
-        if (directionalLights[i].diffuse == vec3(0.0f)) continue;
+        if (pointLights[i].diffuse == vec3(0.0f)) continue;
 
-        accumulator += getDirectionaLight(directionalLights[i], material, norm, viewDir);
+        accumulator += getPointLight(pointLights[i], material, norm, FragPos, viewDir, TexCoord);
     }
 
     // Gamma Correction
